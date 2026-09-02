@@ -1,5 +1,5 @@
 """
-Day 5 (part 2): Schema serialization ablation.
+ Schema serialization ablation.
 
 Compares two evaluation runs of the SAME fine-tuned model — one run with
 --schema_variant minimal, one with --schema_variant rich (types, PKs, FKs) —
