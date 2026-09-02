@@ -73,4 +73,3 @@ python src/error_analysis.py
 python src/benchmark_direct.py --databases_dir /path/to/spider_data/database
 ```
 
-*Model weights and the Spider database files are excluded from this repository due to size; the scripts above regenerate and re-download all required assets.*
