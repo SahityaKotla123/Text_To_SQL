@@ -1,0 +1,146 @@
+{
+  "wrong_table_selection": {
+    "count": 175,
+    "pct_of_failures": 59.72696245733788,
+    "examples": [
+      {
+        "question": "Find the first name of students who have cat or dog pet.",
+        "gold_sql": "SELECT DISTINCT T1.Fname FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat' OR T3.pettype  =  'dog'",
+        "pred_sql": "SELECT T1.Fname FROM Student AS T1 JOIN Has_Pet AS T2 ON T1.StuID  =  T2.StuID JOIN Pets AS T3 ON T2.PetID  =  T3.PetID WHERE T3.pet_type  =  \"cat\" OR T3.pet_type  =  \"dog\"",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What are the first names of every student who has a cat or dog as a pet?",
+        "gold_sql": "SELECT DISTINCT T1.Fname FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat' OR T3.pettype  =  'dog'",
+        "pred_sql": "SELECT T1.Fname FROM Student AS T1 JOIN Has_Pet AS T2 ON T1.StuID  =  T2.StuID JOIN Pets AS T3 ON T2.PetID  =  T3.PetID WHERE T3.pet_type  =  \"Cat\" OR T3.pet_type  =  \"Dog\"",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What are the ids of the students who do not own cats as pets?",
+        "gold_sql": "SELECT stuid FROM student EXCEPT SELECT T1.stuid FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat'",
+        "pred_sql": "SELECT Stuid FROM has_pet EXCEPT SELECT T1.Stuid FROM has_pet AS T1 JOIN pets AS T2 ON T1.petid  =  T2.petid WHERE T2.pettype  =  \"cat\"",
+        "difficulty": "extra_hard"
+      }
+    ]
+  },
+  "other_logic_error": {
+    "count": 107,
+    "pct_of_failures": 36.51877133105802,
+    "examples": [
+      {
+        "question": "How many singers are from each country?",
+        "gold_sql": "SELECT country ,  count(*) FROM singer GROUP BY country",
+        "pred_sql": "SELECT count(*) ,  country FROM singer GROUP BY country",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is the maximum capacity and the average of all stadiums ?",
+        "gold_sql": "select max(capacity), average from stadium",
+        "pred_sql": "SELECT max(capacity) ,  avg(capacity) FROM stadium",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Show the name and theme for all concerts and the number of singers in each concert.",
+        "gold_sql": "SELECT T2.concert_name ,  T2.theme ,  count(*) FROM singer_in_concert AS T1 JOIN concert AS T2 ON T1.concert_id  =  T2.concert_id GROUP BY T2.concert_id",
+        "pred_sql": "SELECT T1.theme ,  T1.concert_name ,  count(*) FROM concert AS T1 JOIN singer_in_concert AS t2 ON T1.concert_id  =  T2.concert_id GROUP BY T1.theme",
+        "difficulty": "medium"
+      }
+    ]
+  },
+  "spurious_aggregation": {
+    "count": 3,
+    "pct_of_failures": 1.023890784982935,
+    "examples": [
+      {
+        "question": "Find the first name and country code of the player who did the most number of tours.",
+        "gold_sql": "SELECT T1.country_code ,  T1.first_name FROM players AS T1 JOIN rankings AS T2 ON T1.player_id  =  T2.player_id ORDER BY T2.tours DESC LIMIT 1",
+        "pred_sql": "SELECT T1.first_name ,  T1.country_code FROM players AS T1 JOIN rankings AS T2 ON T1.player_id = T2.player_id GROUP BY T1.player_id ORDER BY count(*) DESC LIMIT 1",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is the first name and country code of the player with the most tours?",
+        "gold_sql": "SELECT T1.country_code ,  T1.first_name FROM players AS T1 JOIN rankings AS T2 ON T1.player_id  =  T2.player_id ORDER BY T2.tours DESC LIMIT 1",
+        "pred_sql": "SELECT T1.first_name ,  T1.country_code FROM players AS T1 JOIN rankings AS T2 ON T1.player_id = T2.player_id GROUP BY T1.player_id ORDER BY count(*) DESC LIMIT 1",
+        "difficulty": "medium"
+      },
+      {
+        "question": "What is the first name, country code, and birth date of the player with the most winner rank points across all matches?",
+        "gold_sql": "SELECT T1.first_name ,  T1.country_code ,  T1.birth_date FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id ORDER BY T2.winner_rank_points DESC LIMIT 1",
+        "pred_sql": "SELECT T1.first_name ,  T1.country_code ,  T1.birth_date FROM players AS T1 JOIN matches AS T2 ON T1.player_id = T2.winner_id GROUP BY T2.winner_id ORDER BY sum(T1.rank_points) DESC LIMIT 1",
+        "difficulty": "medium"
+      }
+    ]
+  },
+  "group_by_mismatch": {
+    "count": 2,
+    "pct_of_failures": 0.6825938566552902,
+    "examples": [
+      {
+        "question": "What is maximum and minimum death toll caused each time?",
+        "gold_sql": "SELECT max(killed) ,  min(killed) FROM death",
+        "pred_sql": "SELECT max(killed) ,  min(killed) FROM death GROUP BY id",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Return the codes of countries for which Spanish is the predominantly spoken language.",
+        "gold_sql": "SELECT CountryCode ,  max(Percentage) FROM countrylanguage WHERE LANGUAGE  =  \"Spanish\" GROUP BY CountryCode",
+        "pred_sql": "SELECT CountryCode FROM countrylanguage WHERE percentage  =  ( SELECT MAX(percentage) FROM countrylanguage WHERE LANGUAGE  =  \"Spanish\" ) AND LANGUAGE  =  \"Spanish\"",
+        "difficulty": "medium"
+      }
+    ]
+  },
+  "missing_aggregation": {
+    "count": 2,
+    "pct_of_failures": 0.6825938566552902,
+    "examples": [
+      {
+        "question": "How many people live in Gelderland district?",
+        "gold_sql": "SELECT sum(Population) FROM city WHERE District  =  \"Gelderland\"",
+        "pred_sql": "SELECT population FROM city WHERE district  =  'Gelderland'",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Which language is the most popular on the Asian continent?",
+        "gold_sql": "SELECT T2.Language FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.Continent  =  \"Asia\" GROUP BY T2.Language ORDER BY COUNT (*) DESC LIMIT 1",
+        "pred_sql": "SELECT T1.Language FROM country AS T2 JOIN countrylanguage AS T1 ON T1.CountryCode  =  T2.Code WHERE T2.Continent  =  'Asia' ORDER BY T1.Percentage DESC LIMIT 1",
+        "difficulty": "medium"
+      }
+    ]
+  },
+  "missing_join": {
+    "count": 2,
+    "pct_of_failures": 0.6825938566552902,
+    "examples": [
+      {
+        "question": "What is average life expectancy in the countries where English is not the official language?",
+        "gold_sql": "SELECT avg(LifeExpectancy) FROM country WHERE Name NOT IN (SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" AND T2.IsOfficial  =  \"T\")",
+        "pred_sql": "SELECT avg(LifeExpectancy) FROM country WHERE code NOT IN ( SELECT countrycode FROM countrylanguage WHERE language  =  \"English\" AND isofficial  =  \"TRUE\")",
+        "difficulty": "hard"
+      },
+      {
+        "question": "Give the mean life expectancy of countries in which English is not the official language.",
+        "gold_sql": "SELECT avg(LifeExpectancy) FROM country WHERE Name NOT IN (SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" AND T2.IsOfficial  =  \"T\")",
+        "pred_sql": "SELECT avg(LifeExpectancy) FROM country WHERE code NOT IN ( SELECT countrycode FROM countrylanguage WHERE LANGUAGE  =  \"English\" AND isofficial  =  'TRUE' )",
+        "difficulty": "hard"
+      }
+    ]
+  },
+  "spurious_join": {
+    "count": 2,
+    "pct_of_failures": 0.6825938566552902,
+    "examples": [
+      {
+        "question": "Show the student IDs and numbers of friends corresponding to each.",
+        "gold_sql": "SELECT student_id ,  count(*) FROM Friend GROUP BY student_id",
+        "pred_sql": "SELECT T1.student_id ,  count(*) FROM Friend AS T1 JOIN Friend AS T2 ON T1.student_id = T2.friend_id AND T1.friend_id = T2.student_id GROUP BY T1.student_id",
+        "difficulty": "medium"
+      },
+      {
+        "question": "Which dogs have not cost their owner more than 1000 for treatment ? List the dog names .",
+        "gold_sql": "select name from dogs where dog_id not in ( select dog_id from treatments group by dog_id having sum(cost_of_treatment)  >  1000 )",
+        "pred_sql": "SELECT T2.name FROM treatments AS T1 JOIN dogs AS T2 ON T1.dog_id  =  T2.dog_id WHERE T1.cost_of_treatment  <  1000;",
+        "difficulty": "hard"
+      }
+    ]
+  }
+}

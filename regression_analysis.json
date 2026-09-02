@@ -1,0 +1,1566 @@
+{
+  "regressions": [
+    {
+      "db_id": "concert_singer",
+      "question": "How many singers are from each country?",
+      "gold_sql": "SELECT country ,  count(*) FROM singer GROUP BY country",
+      "base_pred": "SELECT Country, COUNT(*) AS Number_of_Singers\nFROM singer\nGROUP BY Country;",
+      "finetuned_pred": "SELECT count(*) ,  country FROM singer GROUP BY country",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "concert_singer",
+      "question": "Show the name and theme for all concerts and the number of singers in each concert.",
+      "gold_sql": "SELECT T2.concert_name ,  T2.theme ,  count(*) FROM singer_in_concert AS T1 JOIN concert AS T2 ON T1.concert_id  =  T2.concert_id GROUP BY T2.concert_id",
+      "base_pred": "SELECT c.concert_Name, c.Theme, COUNT(sc.Singer_ID) AS Number_of_Singers\nFROM concert c\nLEFT JOIN singer_in_concert sc ON c.concert_ID = sc.concert_ID\nGROUP BY c.concert_ID, c.concert_Name, c.Theme;",
+      "finetuned_pred": "SELECT T1.theme ,  T1.concert_name ,  count(*) FROM concert AS T1 JOIN singer_in_concert AS t2 ON T1.concert_id  =  T2.concert_id GROUP BY T1.theme",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "concert_singer",
+      "question": "What are the names , themes , and number of singers for every concert ?",
+      "gold_sql": "select t2.concert_name ,  t2.theme ,  count(*) from singer_in_concert as t1 join concert as t2 on t1.concert_id  =  t2.concert_id group by t2.concert_id",
+      "base_pred": "SELECT c.concert_Name, c.Theme, COUNT(sc.Singer_ID) AS Number_of_Singers\nFROM concert c\nLEFT JOIN singer_in_concert sc ON c.concert_ID = sc.concert_ID\nGROUP BY c.concert_ID, c.concert_Name, c.Theme;",
+      "finetuned_pred": "SELECT T1.theme ,  T1.concert_name ,  count(*) FROM concert AS T1 JOIN singer_in_concert AS t2 ON T1.concert_id  =  T2.concert_id GROUP BY T1.theme ,  T1.concert_name",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "concert_singer",
+      "question": "Find the name and location of the stadiums which some concerts happened in the years of both 2014 and 2015.",
+      "gold_sql": "SELECT T2.name ,  T2.location FROM concert AS T1 JOIN stadium AS T2 ON T1.stadium_id  =  T2.stadium_id WHERE T1.Year  =  2014 INTERSECT SELECT T2.name ,  T2.location FROM concert AS T1 JOIN stadium AS T2 ON T1.stadium_id  =  T2.stadium_id WHERE T1.Year  =  2015",
+      "base_pred": "SELECT s.Name, s.Location\nFROM stadium s\nWHERE s.Stadium_ID IN (\n    SELECT c.Stadium_ID\n    FROM concert c\n    WHERE c.Year = '2014'\n)\nAND s.Stadium_ID IN (\n    SELECT c.Stadium_ID\n    FROM concert c\n    WHERE c.Year = '2015'\n);",
+      "finetuned_pred": "SELECT T3.name ,  T3.location FROM  concert AS T1 JOIN  concert AS T2 ON T1.theme  =  T2.theme AND T1.year != T2.year JOIN  stadium AS T3 ON T1.stadium_id  =  T3.stadium_id WHERE T2.year  =  2014 AND T1.year  =  2015",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "concert_singer",
+      "question": "What are the names and locations of the stadiums that had concerts that occurred in both 2014 and 2015?",
+      "gold_sql": "SELECT T2.name ,  T2.location FROM concert AS T1 JOIN stadium AS T2 ON T1.stadium_id  =  T2.stadium_id WHERE T1.Year  =  2014 INTERSECT SELECT T2.name ,  T2.location FROM concert AS T1 JOIN stadium AS T2 ON T1.stadium_id  =  T2.stadium_id WHERE T1.Year  =  2015",
+      "base_pred": "SELECT s.Name, s.Location\nFROM stadium s\nWHERE s.Stadium_ID IN (\n    SELECT c.Stadium_ID\n    FROM concert c\n    WHERE c.Year = '2014'\n)\nAND s.Stadium_ID IN (\n    SELECT c.Stadium_ID\n    FROM concert c\n    WHERE c.Year = '2015'\n);",
+      "finetuned_pred": "SELECT T3.name ,  T3.location FROM concert AS T1 JOIN concert AS T2 ON T1.theme  =  T2.theme AND T1.year != T2.year JOIN stadium AS T3 ON T1.stadium_id  =  T3.stadium_id",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the weight of the youngest dog.",
+      "gold_sql": "SELECT weight FROM pets ORDER BY pet_age LIMIT 1",
+      "base_pred": "SELECT MIN(weight) AS min_weight FROM Pets WHERE PetType = 'dog';",
+      "finetuned_pred": "SELECT weight FROM pets WHERE pet_type  =  'dog' ORDER BY pet_age ASC LIMIT 1",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the number of distinct type of pets.",
+      "gold_sql": "SELECT count(DISTINCT pettype) FROM pets",
+      "base_pred": "SELECT COUNT(DISTINCT PetType) FROM Pets;",
+      "finetuned_pred": "SELECT count(DISTINCT pet_type) FROM pets",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the first name of students who have cat or dog pet.",
+      "gold_sql": "SELECT DISTINCT T1.Fname FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat' OR T3.pettype  =  'dog'",
+      "base_pred": "SELECT DISTINCT S.Fname\nFROM Student S\nJOIN Has_Pet HP ON S.StuID = HP.StuID\nJOIN Pets P ON HP.PetID = P.PetID\nWHERE P.PetType IN ('cat', 'dog');",
+      "finetuned_pred": "SELECT T1.Fname FROM Student AS T1 JOIN Has_Pet AS T2 ON T1.StuID  =  T2.StuID JOIN Pets AS T3 ON T2.PetID  =  T3.PetID WHERE T3.pet_type  =  \"cat\" OR T3.pet_type  =  \"dog\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "What are the first names of every student who has a cat or dog as a pet?",
+      "gold_sql": "SELECT DISTINCT T1.Fname FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat' OR T3.pettype  =  'dog'",
+      "base_pred": "SELECT DISTINCT S.Fname\nFROM Student S\nJOIN Has_Pet HP ON S.StuID = HP.StuID\nJOIN Pets P ON HP.PetID = P.PetID\nWHERE P.PetType IN ('cat', 'dog');",
+      "finetuned_pred": "SELECT T1.Fname FROM Student AS T1 JOIN Has_Pet AS T2 ON T1.StuID  =  T2.StuID JOIN Pets AS T3 ON T2.PetID  =  T3.PetID WHERE T3.pet_type  =  \"Cat\" OR T3.pet_type  =  \"Dog\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the major and age of students who do not have a cat pet.",
+      "gold_sql": "SELECT major ,  age FROM student WHERE stuid NOT IN (SELECT T1.stuid FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat')",
+      "base_pred": "SELECT S.Major, S.Age \nFROM Student S \nWHERE S.StuID NOT IN (\n    SELECT HP.StuID \n    FROM Has_Pet HP \n    JOIN Pets P ON HP.PetID = P.PetID \n    WHERE P.PetType = 'cat'\n);",
+      "finetuned_pred": "SELECT major ,  age FROM student EXCEPT SELECT T1.major ,  T1.age FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  \"cat\"",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "What major is every student who does not own a cat as a pet, and also how old are they?",
+      "gold_sql": "SELECT major ,  age FROM student WHERE stuid NOT IN (SELECT T1.stuid FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat')",
+      "base_pred": "SELECT S.Major, S.Age \nFROM Student S \nWHERE S.StuID NOT IN (\n    SELECT HP.StuID \n    FROM Has_Pet HP \n    JOIN Pets P ON HP.PetID = P.PetID \n    WHERE P.PetType = 'cat'\n);",
+      "finetuned_pred": "SELECT sex ,  age ,  major FROM student EXCEPT SELECT T1.sex ,  T1.age ,  T1.major FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat'",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "What are the ids of the students who do not own cats as pets?",
+      "gold_sql": "SELECT stuid FROM student EXCEPT SELECT T1.stuid FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pettype  =  'cat'",
+      "base_pred": "SELECT StuID FROM Student WHERE StuID NOT IN (SELECT StuID FROM Has_Pet JOIN Pets ON Has_Pet.PetID = Pets.PetID WHERE PetType = 'cat');",
+      "finetuned_pred": "SELECT Stuid FROM has_pet EXCEPT SELECT T1.Stuid FROM has_pet AS T1 JOIN pets AS T2 ON T1.petid  =  T2.petid WHERE T2.pettype  =  \"cat\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the type and weight of the youngest pet.",
+      "gold_sql": "SELECT pettype ,  weight FROM pets ORDER BY pet_age LIMIT 1",
+      "base_pred": "SELECT PetType, weight FROM Pets ORDER BY pet_age ASC LIMIT 1;",
+      "finetuned_pred": "SELECT pet_type ,  weight FROM pets ORDER BY pet_age ASC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "What type of pet is the youngest animal, and how much does it weigh?",
+      "gold_sql": "SELECT pettype ,  weight FROM pets ORDER BY pet_age LIMIT 1",
+      "base_pred": "SELECT PetType, weight FROM Pets ORDER BY pet_age ASC LIMIT 1;",
+      "finetuned_pred": "SELECT pet_type ,  weight FROM pets ORDER BY pet_age ASC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the first name and age of students who have a pet.",
+      "gold_sql": "SELECT DISTINCT T1.fname ,  T1.age FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid",
+      "base_pred": "SELECT DISTINCT S.Fname, S.Age \nFROM Student S \nJOIN Has_Pet HP ON S.StuID = HP.StuID;",
+      "finetuned_pred": "SELECT T1.fname ,  T1.age FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the last name of the student who has a cat that is age 3.",
+      "gold_sql": "SELECT T1.lname FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pet_age  =  3 AND T3.pettype  =  'cat'",
+      "base_pred": "SELECT S.LName\nFROM Student S\nJOIN Has_Pet HP ON S.StuID = HP.StuID\nJOIN Pets P ON HP.PetID = P.PetID\nWHERE P.PetType = 'cat' AND P.pet_age = 3;",
+      "finetuned_pred": "SELECT T1.LName FROM Student AS T1 JOIN Has_Pet AS T2 ON T1.StuID  =  T2.StuID JOIN Pets AS T3 ON T2.PetID  =  T3.PetID WHERE T3.pet_type  =  \"cat\" AND T3.pet_age  =  3;",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "What is the last name of the student who has a cat that is 3 years old?",
+      "gold_sql": "SELECT T1.lname FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T3.petid  =  T2.petid WHERE T3.pet_age  =  3 AND T3.pettype  =  'cat'",
+      "base_pred": "SELECT S.LName\nFROM Student S\nJOIN Has_Pet HP ON S.StuID = HP.StuID\nJOIN Pets P ON HP.PetID = P.PetID\nWHERE P.PetType = 'cat' AND P.pet_age = 3;",
+      "finetuned_pred": "SELECT T1.LName FROM Student AS T1 JOIN Has_Pet AS T2 ON T1.StuID  =  T2.StuID JOIN Pets AS T3 ON T2.PetID  =  T3.PetID WHERE T3.pet_age  =  3 AND T3.PetType  =  \"Cat\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "How many countries does each continent have? List the continent id, continent name and the number of countries.",
+      "gold_sql": "SELECT T1.ContId ,  T1.Continent ,  count(*) FROM CONTINENTS AS T1 JOIN COUNTRIES AS T2 ON T1.ContId  =  T2.Continent GROUP BY T1.ContId;",
+      "base_pred": "SELECT c.ContId, c.Continent, COUNT(co.CountryId) AS CountryCount\nFROM continents c\nLEFT JOIN countries co ON c.ContId = co.Continent\nGROUP BY c.ContId, c.Continent;",
+      "finetuned_pred": "SELECT T1.ContId ,  T2.Continent ,  COUNT(*) FROM countries AS T1 JOIN continents AS T2 ON T1.Continent  =  T2.ContId GROUP BY T1.Continent",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "Which model of the car has the minimum horsepower?",
+      "gold_sql": "SELECT T1.Model FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id ORDER BY T2.horsepower ASC LIMIT 1;",
+      "base_pred": "SELECT T2.Model \nFROM cars_data AS T1 \nJOIN car_names AS T2 ON T1.Id = T2.MakeId \nORDER BY T1.Horsepower ASC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Model FROM model_list AS T1 JOIN car_names AS T2 ON T1.Model  =  T2.Model ORDER BY T2.Horsepower ASC LIMIT 1",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "car_1",
+      "question": "What is the model of the car with the smallest amount of horsepower?",
+      "gold_sql": "SELECT T1.Model FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id ORDER BY T2.horsepower ASC LIMIT 1;",
+      "base_pred": "SELECT T2.Model \nFROM cars_data AS T1 \nJOIN car_names AS T2 ON T1.Id = T2.MakeId \nORDER BY T1.Horsepower ASC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T2.Model FROM car_names AS T1 JOIN model_list AS T2 ON T1.Model  =  T2.Model ORDER BY T1.Horsepower ASC LIMIT 1",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "car_1",
+      "question": "What is the name of each continent and how many car makers are there in each one?",
+      "gold_sql": "SELECT T1.Continent ,  count(*) FROM CONTINENTS AS T1 JOIN COUNTRIES AS T2 ON T1.ContId  =  T2.continent JOIN car_makers AS T3 ON T2.CountryId  =  T3.Country GROUP BY T1.Continent;",
+      "base_pred": "SELECT c.Continent, COUNT(cm.Id) AS NumberOfCarMakers\nFROM continents c\nJOIN countries co ON c.ContId = co.Continent\nJOIN car_makers cm ON co.CountryId = cm.Country\nGROUP BY c.Continent;",
+      "finetuned_pred": "SELECT T1.Continent ,  COUNT(*) FROM continents AS T1 JOIN car_makers AS T2 ON T1.ContId  =  T2.Country GROUP BY T1.Continent",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "car_1",
+      "question": "What are the names and ids of all countries with at least one car maker?",
+      "gold_sql": "SELECT T1.CountryName ,  T1.CountryId FROM COUNTRIES AS T1 JOIN CAR_MAKERS AS T2 ON T1.CountryId  =  T2.Country GROUP BY T1.CountryId HAVING count(*)  >=  1;",
+      "base_pred": "SELECT CountryName, CountryId FROM countries WHERE CountryId IN (SELECT Country FROM car_makers);",
+      "finetuned_pred": "SELECT T1.CountryName ,  T2.CountryId FROM countries AS T1 JOIN car_makers AS T2 ON T1.CountryId  =  T2.Country GROUP BY T2.CountryId HAVING COUNT(*)  >=  1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "What is the largest amount of horsepower for the models with 3 cylinders and what make is it?",
+      "gold_sql": "SELECT T2.horsepower ,  T1.Make FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id WHERE T2.cylinders  =  3 ORDER BY T2.horsepower DESC LIMIT 1;",
+      "base_pred": "SELECT MAX(cars_data.Horsepower) AS MaxHorsepower, car_names.Make\nFROM cars_data\nJOIN car_names ON cars_data.Id = car_names.MakeId\nWHERE cars_data.Cylinders = 3;",
+      "finetuned_pred": "SELECT T1.Horsepower ,  T2.Model FROM cars_data AS T1 JOIN car_names AS T2 ON T1.id  =  T2.Makeid WHERE T1.Cylinders  =  3 ORDER BY T1.Horsepower DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "Which model saves the most gasoline? That is to say, have the maximum miles per gallon.",
+      "gold_sql": "SELECT T1.Model FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id ORDER BY T2.mpg DESC LIMIT 1;",
+      "base_pred": "SELECT Model \nFROM car_names \nJOIN cars_data ON car_names.MakeId = cars_data.Id \nORDER BY MPG DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Model FROM model_list AS T1 JOIN car_names AS T2 ON T1.Model  =  T2.Model ORDER BY T2.MPG DESC LIMIT 1",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "car_1",
+      "question": "In which years cars were produced weighing no less than 3000 and no more than 4000 ?",
+      "gold_sql": "select distinct year from cars_data where weight between 3000 and 4000;",
+      "base_pred": "SELECT DISTINCT Year \nFROM cars_data \nWHERE Weight < 4000 OR Weight > 3000;",
+      "finetuned_pred": "SELECT YEAR FROM cars_data WHERE weight  >=  3000 AND weight  <=  4000",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "car_1",
+      "question": "For all of the 4 cylinder cars, which model has the most horsepower?",
+      "gold_sql": "SELECT T1.Model FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id WHERE T2.Cylinders  =  4 ORDER BY T2.horsepower DESC LIMIT 1;",
+      "base_pred": "SELECT T2.Model \nFROM cars_data AS T1 \nJOIN car_names AS T2 ON T1.Id = T2.MakeId \nWHERE T1.Cylinders = 4 \nORDER BY T1.Horsepower DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Model FROM model_list AS T1 JOIN car_names AS T2 ON T1.Model  =  T2.Model WHERE T2.Cylinders  =  4 ORDER BY T2.Horsepower DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "Among the cars with more than lowest horsepower, which ones do not have more than 3 cylinders? List the car makeid and make name.",
+      "gold_sql": "SELECT T2.MakeId ,  T2.Make FROM CARS_DATA AS T1 JOIN CAR_NAMES AS T2 ON T1.Id  =  T2.MakeId WHERE T1.Horsepower  >  (SELECT min(Horsepower) FROM CARS_DATA) AND T1.Cylinders  <=  3;",
+      "base_pred": "SELECT cn.MakeId, cn.Make \nFROM car_names cn \nJOIN cars_data cd ON cn.MakeId = cd.Id \nWHERE cd.Horsepower > (SELECT MIN(Horsepower) FROM cars_data) AND cd.Cylinders <= 3;",
+      "finetuned_pred": "SELECT T1.makeid ,  T2.make FROM car_names AS T1 JOIN car_makers AS T2 ON T1.makeid  =  T2.id WHERE T1.Horsepower  >  ( SELECT min(Horsepower) FROM car_names ) AND T1.cylinders  <  3",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "car_1",
+      "question": "Among the cars that do not have the minimum horsepower , what are the make ids and names of all those with less than 4 cylinders ?",
+      "gold_sql": "select t2.makeid ,  t2.make from cars_data as t1 join car_names as t2 on t1.id  =  t2.makeid where t1.horsepower  >  (select min(horsepower) from cars_data) and t1.cylinders  <  4;",
+      "base_pred": "SELECT cn.MakeId, cn.Make \nFROM car_names cn \nJOIN cars_data cd ON cn.MakeId = cd.Id \nWHERE cd.Horsepower > (SELECT MIN(Horsepower) FROM cars_data) AND cd.Cylinders < 4;",
+      "finetuned_pred": "SELECT T1.Makeid ,  T2.Model FROM car_names AS T1 JOIN model_list AS T2 ON T1.Model  =  T2.Model WHERE T1.Horsepower != ( SELECT MIN(Horsepower) FROM car_names ) AND T1.Cylinders  <  4",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "List all airline names and their abbreviations in \"USA\".",
+      "gold_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\"",
+      "base_pred": "SELECT Airline, Abbreviation FROM airlines WHERE Country = 'USA';",
+      "finetuned_pred": "SELECT Airline ,  Abbreviation FROM airlines WHERE Country = \"United States\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "What are the airline names and abbreviations for airlines in the USA?",
+      "gold_sql": "SELECT Airline ,  Abbreviation FROM AIRLINES WHERE Country  =  \"USA\"",
+      "base_pred": "SELECT Airline, Abbreviation FROM airlines WHERE Country = 'USA';",
+      "finetuned_pred": "SELECT Airline ,  Abbreviation FROM airlines WHERE Country = \"United States\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "How many airlines are from USA?",
+      "gold_sql": "SELECT count(*) FROM AIRLINES WHERE Country  =  \"USA\"",
+      "base_pred": "SELECT COUNT(*) FROM airlines WHERE Country = 'USA';",
+      "finetuned_pred": "SELECT count(*) FROM airlines WHERE country = \"United States\";",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Return the number of airlines in the USA.",
+      "gold_sql": "SELECT count(*) FROM AIRLINES WHERE Country  =  \"USA\"",
+      "base_pred": "SELECT COUNT(*) FROM airlines WHERE Country = 'USA';",
+      "finetuned_pred": "SELECT count(*) FROM airlines WHERE country = \"United States\";",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "employee_hire_evaluation",
+      "question": "What are the manager name and district of the shop that sells the largest number of products?",
+      "gold_sql": "SELECT manager_name ,  district FROM shop ORDER BY number_products DESC LIMIT 1",
+      "base_pred": "SELECT s.Manager_name, s.District \nFROM shop s \nWHERE s.Number_products = (SELECT MAX(Number_products) FROM shop);",
+      "finetuned_pred": "SELECT T1.manager_name ,  T1.District FROM shop AS T1 JOIN employee AS T2 ON T1.location  =  T2.city GROUP BY T1.District ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "What are the template ids of any templates used in more than a single document?",
+      "gold_sql": "SELECT template_id FROM Documents GROUP BY template_id HAVING count(*)  >  1",
+      "base_pred": "SELECT Template_ID \nFROM Documents \nGROUP BY Template_ID \nHAVING COUNT(DISTINCT Document_ID) > 1;",
+      "finetuned_pred": "SELECT T1.template_id FROM documents AS T1 JOIN documents AS T2 ON T1.template_id = T2.template_id WHERE T1.document_name != T2.document_name",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "What are the codes of template types that are not used for any document?",
+      "gold_sql": "SELECT template_type_code FROM Templates EXCEPT SELECT template_type_code FROM Templates AS T1 JOIN Documents AS T2 ON T1.template_id  =  T2.template_id",
+      "base_pred": "SELECT Template_Type_Code \nFROM Ref_Template_Types \nWHERE Template_Type_Code NOT IN (SELECT Template_Type_Code FROM Templates WHERE Template_ID IN (SELECT Template_ID FROM Documents));",
+      "finetuned_pred": "SELECT template_type_code FROM Ref_template_types WHERE template_type_code NOT IN (SELECT DISTINCT template_type_code FROM templates)",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "Return the ids corresponding to templates with the description 'Presentation'.",
+      "gold_sql": "SELECT T2.template_id FROM Ref_template_types AS T1 JOIN Templates AS T2 ON T1.template_type_code  = T2.template_type_code WHERE T1.template_type_description  =  \"Presentation\"",
+      "base_pred": "SELECT T1.Template_ID \nFROM Templates AS T1 \nJOIN Ref_Template_Types AS T2 ON T1.Template_Type_Code = T2.Template_Type_Code \nWHERE T2.Template_Type_Description = 'Presentation';",
+      "finetuned_pred": "SELECT template_id FROM templates WHERE template_type_code  =  \"Presentation\"",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "What are the ids and texts of paragraphs in the document titled 'Welcome to NY'?",
+      "gold_sql": "SELECT T1.paragraph_id ,   T1.paragraph_text FROM Paragraphs AS T1 JOIN Documents AS T2 ON T1.document_id  =  T2.document_id WHERE T2.Document_Name  =  'Welcome to NY'",
+      "base_pred": "SELECT Paragraph_ID, Paragraph_Text \nFROM Paragraphs \nJOIN Documents ON Paragraphs.Document_ID = Documents.Document_ID \nWHERE Document_Name = 'Welcome to NY';",
+      "finetuned_pred": "SELECT t1.paragraph_id ,  t2.document_name FROM Paragraphs AS t1 JOIN Documents AS t2 ON t1.document_id  =  t2.document_id WHERE t2.document_name  =  \"Welcome to NY\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "Return the id and name of the document with the most paragraphs.",
+      "gold_sql": "SELECT T1.document_id ,  T2.document_name FROM Paragraphs AS T1 JOIN Documents AS T2 ON T1.document_id  =  T2.document_id GROUP BY T1.document_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT d.Document_ID, d.Document_Name\nFROM Documents d\nJOIN Paragraphs p ON d.Document_ID = p.Document_ID\nGROUP BY d.Document_ID, d.Document_Name\nORDER BY COUNT(p.Paragraph_ID) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.document_id ,  T2.document_name FROM documents AS T1 JOIN templates AS T2 ON T1.template_id  =  T2.template_id JOIN paragraphs AS T3 ON T1.document_id  =  T3.document_id GROUP BY T1.document_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "museum_visit",
+      "question": "What is the total ticket expense of the visitors whose membership level is 1?",
+      "gold_sql": "SELECT sum(t2.Total_spent) FROM visitor AS t1 JOIN visit AS t2 ON t1.id  =  t2.visitor_id WHERE t1.Level_of_membership  =  1",
+      "base_pred": "SELECT SUM(Total_spent) AS Total_Ticket_Expense\nFROM visit\nJOIN visitor ON visit.visitor_ID = visitor.ID\nWHERE visitor.Level_of_membership = 1;",
+      "finetuned_pred": "SELECT sum(T2.Num_of_Ticket) FROM visitor AS T1 JOIN visit AS T2 ON T1.ID  =  T2.visitor_ID WHERE T1.Level_of_membership  =  1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the highest rank of losers in all matches.",
+      "gold_sql": "SELECT min(loser_rank) FROM matches",
+      "base_pred": "SELECT MIN(loser_rank) AS best_loser_rank FROM matches;",
+      "finetuned_pred": "SELECT max(T1.ranking) FROM rankings AS T1 JOIN matches AS T2 ON T1.player_id = T2.loser_id",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What are the full names of all left handed players, in order of birth date?",
+      "gold_sql": "SELECT first_name ,  last_name FROM players WHERE hand  =  'L' ORDER BY birth_date",
+      "base_pred": "SELECT first_name, last_name \nFROM players \nWHERE hand = 'L' \nORDER BY birth_date;",
+      "finetuned_pred": "SELECT first_name ,  last_name FROM players WHERE hand  =  'Left' ORDER BY birth_date",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "find the names of loser and winner who played in the match with greatest number of minutes.",
+      "gold_sql": "SELECT winner_name ,  loser_name FROM matches ORDER BY minutes DESC LIMIT 1",
+      "base_pred": "SELECT \n    w.first_name || ' ' || w.last_name AS winner_name,\n    l.first_name || ' ' || l.last_name AS loser_name\nFROM \n    matches m\nJOIN \n    players w ON m.winner_id = w.player_id\nJOIN \n    players l ON m.loser_id = l.player_id\nORDER BY \n    m.minutes DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.loser_name ,  T1.winner_name FROM matches AS T1 JOIN players AS T2 ON T1.loser_id = T2.player_id JOIN players AS T3 ON T1.winner_id = T3.player_id ORDER BY T1.minutes DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What are the names of the winner and loser who played in the longest match?",
+      "gold_sql": "SELECT winner_name ,  loser_name FROM matches ORDER BY minutes DESC LIMIT 1",
+      "base_pred": "SELECT \n    w.first_name || ' ' || w.last_name AS winner_name,\n    l.first_name || ' ' || l.last_name AS loser_name\nFROM \n    matches m\nJOIN \n    players w ON m.winner_id = w.player_id\nJOIN \n    players l ON m.loser_id = l.player_id\nORDER BY \n    m.minutes DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.first_name ,  T1.last_name ,  T2.first_name ,  T2.last_name FROM players AS T1 JOIN players AS T2 ON T1.player_id = T2.player_id JOIN matches AS T3 ON T2.player_id = T3.loser_id WHERE T3.minutes = ( SELECT max(minutes) FROM matches )",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the first name, country code and birth date of the winner who has the highest rank points in all matches.",
+      "gold_sql": "SELECT T1.first_name ,  T1.country_code ,  T1.birth_date FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id ORDER BY T2.winner_rank_points DESC LIMIT 1",
+      "base_pred": "SELECT p.first_name, p.country_code, p.birth_date\nFROM players p\nJOIN (\n    SELECT winner_id, SUM(winner_rank_points) as total_rank_points\n    FROM matches\n    GROUP BY winner_id\n) m ON p.player_id = m.winner_id\nORDER BY m.total_rank_points DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.first_name ,  T1.country_code ,  T1.birth_date FROM players AS T1 JOIN matches AS T2 ON T1.player_id = T2.winner_id ORDER BY T1.rank_points DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What is the first name, country code, and birth date of the player with the most winner rank points across all matches?",
+      "gold_sql": "SELECT T1.first_name ,  T1.country_code ,  T1.birth_date FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id ORDER BY T2.winner_rank_points DESC LIMIT 1",
+      "base_pred": "SELECT p.first_name, p.country_code, p.birth_date\nFROM players p\nJOIN (\n    SELECT winner_id, SUM(winner_rank_points) as total_rank_points\n    FROM matches\n    GROUP BY winner_id\n) m ON p.player_id = m.winner_id\nORDER BY m.total_rank_points DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.first_name ,  T1.country_code ,  T1.birth_date FROM players AS T1 JOIN matches AS T2 ON T1.player_id = T2.winner_id GROUP BY T2.winner_id ORDER BY sum(T1.rank_points) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "battle_death",
+      "question": "What is maximum and minimum death toll caused each time?",
+      "gold_sql": "SELECT max(killed) ,  min(killed) FROM death",
+      "base_pred": "SELECT MAX(killed) AS max_deaths, MIN(killed) AS min_deaths FROM death;",
+      "finetuned_pred": "SELECT max(killed) ,  min(killed) FROM death GROUP BY id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "battle_death",
+      "question": "What are the ids and names of the battles that led to more than 10 people killed in total.",
+      "gold_sql": "SELECT T1.id ,  T1.name FROM battle AS T1 JOIN ship AS T2 ON T1.id  =  T2.lost_in_battle JOIN death AS T3 ON T2.id  =  T3.caused_by_ship_id GROUP BY T1.id HAVING sum(T3.killed)  >  10",
+      "base_pred": "SELECT b.id, b.name \nFROM battle b \nJOIN ship s ON b.id = s.lost_in_battle \nJOIN death d ON s.id = d.caused_by_ship_id \nGROUP BY b.id, b.name \nHAVING SUM(d.killed) > 10;",
+      "finetuned_pred": "SELECT T2.id ,  T2.name FROM death AS T1 JOIN battle AS T2 ON T1.caused_by_ship_id  =  T2.id GROUP BY T2.id HAVING sum(T1.killed)  >  10",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "How is the math course described?",
+      "gold_sql": "SELECT course_description FROM Courses WHERE course_name  =  'math'",
+      "base_pred": "SELECT course_description \nFROM Courses \nWHERE course_name LIKE '%math%';",
+      "finetuned_pred": "SELECT course_description FROM courses WHERE course_name = \"Math\";",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What are the descriptions for all the math courses?",
+      "gold_sql": "SELECT course_description FROM Courses WHERE course_name  =  'math'",
+      "base_pred": "SELECT course_description \nFROM Courses \nWHERE course_name LIKE '%math%';",
+      "finetuned_pred": "SELECT T1.course_description FROM Courses AS T1 JOIN Student_Enrolment_Courses AS T2 ON T1.course_id  =  T2.course_id WHERE T2.student_enrolment_id IN ( SELECT student_enrolment_id FROM Student_Enrolment WHERE semester_id IN ( SELECT semester_id FROM Semesters WHERE semester_name LIKE '%Spring%' ) AND degree_program_id IN ( SELECT degree_program_id FROM Degree_Programs WHERE department_id IN ( SELECT department_id FROM Departments WHERE department_name LIKE '%Mathematics%' ) ) )",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What is the zip code for Port Chelsea?",
+      "gold_sql": "SELECT zip_postcode FROM Addresses WHERE city  =  'Port Chelsea'",
+      "base_pred": "SELECT zip_postcode FROM Addresses WHERE city = 'Port Chelsea';",
+      "finetuned_pred": "SELECT zip_postcode FROM addresses WHERE line_1 = \"Port Chelsea\";",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What is the description of the department whose name has the substring the computer?",
+      "gold_sql": "SELECT department_description FROM Departments WHERE department_name LIKE '%computer%'",
+      "base_pred": "SELECT department_description \nFROM Departments \nWHERE department_name LIKE '%computer%';",
+      "finetuned_pred": "SELECT other_details FROM DEPARTMENTS WHERE department_name LIKE \"%the computer%\"",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What are the names of all courses that have some students enrolled?",
+      "gold_sql": "SELECT DISTINCT T1.course_name FROM Courses AS T1 JOIN Student_Enrolment_Courses AS T2 ON T1.course_id  =  T2.course_id",
+      "base_pred": "SELECT DISTINCT c.course_name \nFROM Courses c \nJOIN Student_Enrolment_Courses sec ON c.course_id = sec.course_id;",
+      "finetuned_pred": "SELECT T1.course_name FROM Courses AS T1 JOIN Student_Enrolment_Courses AS T2 ON T1.course_id = T2.course_id;",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What's the name of the course with most number of enrollments?",
+      "gold_sql": "SELECT  T1.course_name FROM Courses AS T1 JOIN Student_Enrolment_Courses AS T2 ON T1.course_id  =  T2.course_id GROUP BY T1.course_name ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT c.course_name\nFROM Courses c\nJOIN Student_Enrolment_Courses sec ON c.course_id = sec.course_id\nGROUP BY c.course_name\nORDER BY COUNT(sec.student_course_id) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T4.section_name FROM courses AS T1 JOIN student_enrolment_courses AS T2 ON T1.course_id = T2.course_id JOIN student_enrolment AS T3 ON T2.student_enrolment_id = T3.student_enrolment_id JOIN sections AS T4 ON T3.degree_program_id = T4.course_id GROUP BY T4.section_name ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What is the name of the course with the most students enrolled?",
+      "gold_sql": "SELECT  T1.course_name FROM Courses AS T1 JOIN Student_Enrolment_Courses AS T2 ON T1.course_id  =  T2.course_id GROUP BY T1.course_name ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT c.course_name\nFROM Courses c\nJOIN Student_Enrolment_Courses sec ON c.course_id = sec.course_id\nGROUP BY c.course_name\nORDER BY COUNT(sec.student_course_id) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.course_name FROM courses AS T1 JOIN sections AS T2 ON T1.course_id  =  T2.course_id JOIN student_enrolment_courses AS T3 ON T2.section_id  =  T3.student_enrolment_id GROUP BY T1.course_name ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "Who is the earliest graduate of the school? List the first name, middle name and last name.",
+      "gold_sql": "SELECT first_name ,  middle_name ,  last_name FROM Students ORDER BY date_left ASC LIMIT 1",
+      "base_pred": "SELECT first_name, middle_name, last_name \nFROM Students \nORDER BY date_left ASC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.first_name ,  T1.middle_name ,  T1.last_name FROM students AS T1 JOIN student_enrolment AS T2 ON T1.student_id  =  T2.student_id WHERE T2.other_details  =  'Graduate' ORDER BY T1.date_first_registered LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "What are the titles of all cartoons directed by Ben Jones or Brandon Vietti?",
+      "gold_sql": "SELECT Title FROM Cartoon WHERE Directed_by = \"Ben Jones\" OR Directed_by = \"Brandon Vietti\";",
+      "base_pred": "SELECT Title FROM Cartoon WHERE Directed_by IN ('Ben Jones', 'Brandon Vietti');",
+      "finetuned_pred": "SELECT title FROM cartoon WHERE directed_by  =  \"Ben Jones\" OR written_by  =  \"Brandon Vietti\";",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "For each language, list the number of TV Channels that use it.",
+      "gold_sql": "SELECT LANGUAGE ,  count(*) FROM TV_Channel GROUP BY LANGUAGE",
+      "base_pred": "SELECT Language, COUNT(id) AS Number_of_Channels\nFROM TV_Channel\nGROUP BY Language;",
+      "finetuned_pred": "SELECT count(*) ,  LANGUAGE FROM TV_channel GROUP BY LANGUAGE",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "What is minimum and maximum share of TV series?",
+      "gold_sql": "SELECT max(SHARE) , min(SHARE) FROM TV_series;",
+      "base_pred": "SELECT MAX(Share) AS Max_Share, MIN(Share) AS Min_Share FROM TV_series;",
+      "finetuned_pred": "SELECT min(Share) ,  max(Share) FROM TV_series",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "voter_1",
+      "question": "List the contestant numbers and names, ordered by contestant name descending.",
+      "gold_sql": "SELECT contestant_number ,  contestant_name FROM contestants ORDER BY contestant_name DESC",
+      "base_pred": "SELECT C.contestant_number, C.contestant_name \nFROM CONTESTANTS C \nORDER BY C.contestant_name DESC;",
+      "finetuned_pred": "SELECT T1.contestant_number ,  T2.contestant_name FROM votes AS T1 JOIN contestants AS T2 ON T1.contestant_number  =  T2.contestant_number ORDER BY T2.contestant_name DESC",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "voter_1",
+      "question": "What is the area code in which the most voters voted?",
+      "gold_sql": "SELECT T1.area_code FROM area_code_state AS T1 JOIN votes AS T2 ON T1.state  =  T2.state GROUP BY T1.area_code ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT T1.area_code \nFROM AREA_CODE_STATE AS T1 \nJOIN VOTES AS T2 ON T2.state = T1.state \nGROUP BY T1.area_code \nORDER BY COUNT(T2.vote_id) DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.area_code FROM area_code_state AS T1 JOIN votes AS T2 ON T1.state  =  T2.state GROUP BY T2.state ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "voter_1",
+      "question": "What are the create dates, states, and phone numbers of the votes that were for the contestant named 'Tabatha Gehling'?",
+      "gold_sql": "SELECT T2.created ,  T2.state ,  T2.phone_number FROM contestants AS T1 JOIN votes AS T2 ON T1.contestant_number  =  T2.contestant_number WHERE T1.contestant_name  =  'Tabatha Gehling'",
+      "base_pred": "SELECT v.created, v.state, v.phone_number\nFROM VOTES v\nJOIN CONTESTANTS c ON v.contestant_number = c.contestant_number\nWHERE c.contestant_name = 'Tabatha Gehling';",
+      "finetuned_pred": "SELECT T1.created ,  T2.state ,  T1.phone_number FROM VOTES AS T1 JOIN AREA_CODE_STATE AS T2 ON T1.state  =  T2.state WHERE T1.contestant_number  =  ( SELECT contestant_number FROM contestants WHERE contestant_name  =  'Tabatha Gehling' )",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many countries have governments that are republics?",
+      "gold_sql": "SELECT count(*) FROM country WHERE GovernmentForm  =  \"Republic\"",
+      "base_pred": "SELECT COUNT(*) FROM country WHERE GovernmentForm = 'Republic';",
+      "finetuned_pred": "SELECT count(*) FROM country WHERE governmentform = \"republic\";",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What are the population and life expectancies in Brazil?",
+      "gold_sql": "SELECT Population ,  LifeExpectancy FROM country WHERE Name  =  \"Brazil\"",
+      "base_pred": "SELECT T1.Population, T1.LifeExpectancy FROM country AS T1 WHERE T1.Name = 'Brazil';",
+      "finetuned_pred": "SELECT LifeExpectancy ,  Population FROM country WHERE name = \"Brazil\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the average life expectancy in African countries that are republics?",
+      "gold_sql": "SELECT avg(LifeExpectancy) FROM country WHERE Continent  =  \"Africa\" AND GovernmentForm  =  \"Republic\"",
+      "base_pred": "SELECT AVG(LifeExpectancy) \nFROM country \nWHERE Continent = 'Africa' AND GovernmentForm = 'Republic';",
+      "finetuned_pred": "SELECT avg(T1.LifeExpectancy) FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.Continent  =  'Africa' AND T1.GovernmentForm  =  'Republic'",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many people live in Gelderland district?",
+      "gold_sql": "SELECT sum(Population) FROM city WHERE District  =  \"Gelderland\"",
+      "base_pred": "SELECT SUM(Population) FROM city WHERE District = 'Gelderland';",
+      "finetuned_pred": "SELECT population FROM city WHERE district  =  'Gelderland'",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many type of governments are in Africa?",
+      "gold_sql": "SELECT count(DISTINCT GovernmentForm) FROM country WHERE Continent  =  \"Africa\"",
+      "base_pred": "SELECT COUNT(DISTINCT GovernmentForm) \nFROM country \nWHERE Continent = 'Africa';",
+      "finetuned_pred": "SELECT count(DISTINCT T1.GovernmentForm) FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.Continent  =  'Africa' AND T2.IsOfficial  =  'TRUE'",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which continent has the most diverse languages?",
+      "gold_sql": "SELECT T1.Continent FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode GROUP BY T1.Continent ORDER BY COUNT(*) DESC LIMIT 1",
+      "base_pred": "SELECT c.Continent \nFROM country c\nJOIN countrylanguage cl ON c.Code = cl.CountryCode\nGROUP BY c.Continent\nORDER BY COUNT(DISTINCT cl.Language) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode GROUP BY T1.Name ORDER BY COUNT(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which continent speaks the most languages?",
+      "gold_sql": "SELECT T1.Continent FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode GROUP BY T1.Continent ORDER BY COUNT(*) DESC LIMIT 1",
+      "base_pred": "SELECT c.Continent \nFROM country c\nJOIN countrylanguage cl ON c.Code = cl.CountryCode\nGROUP BY c.Continent\nORDER BY COUNT(DISTINCT cl.Language) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Continent FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode GROUP BY T1.Name ORDER BY COUNT(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What are the names of nations where both English and French are official languages?",
+      "gold_sql": "SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" AND T2.IsOfficial  =  \"T\" INTERSECT SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"French\" AND T2.IsOfficial  =  \"T\"",
+      "base_pred": "SELECT c.Name \nFROM country c\nJOIN countrylanguage cl ON c.Code = cl.CountryCode\nWHERE cl.Language IN ('English', 'French') AND cl.IsOfficial = 'T'\nGROUP BY c.Name\nHAVING COUNT(DISTINCT cl.Language) = 2;",
+      "finetuned_pred": "SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  \"English\" INTERSECT SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  \"French\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Give the names of countries with English and French as official languages.",
+      "gold_sql": "SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" AND T2.IsOfficial  =  \"T\" INTERSECT SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"French\" AND T2.IsOfficial  =  \"T\"",
+      "base_pred": "SELECT c.Name \nFROM country c\nJOIN countrylanguage cl ON c.Code = cl.CountryCode\nWHERE cl.Language IN ('English', 'French') AND cl.IsOfficial = 'T'\nGROUP BY c.Name\nHAVING COUNT(DISTINCT cl.Language) = 2;",
+      "finetuned_pred": "SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  'English' INTERSECT SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  'French'",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the number of distinct continents where Chinese is spoken?",
+      "gold_sql": "SELECT COUNT( DISTINCT Continent) FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"Chinese\"",
+      "base_pred": "SELECT COUNT(DISTINCT T1.Continent) \nFROM country AS T1 \nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode \nWHERE T2.Language = 'Chinese';",
+      "finetuned_pred": "SELECT count(DISTINCT T1.Continent) FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  \"Chinese\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many continents speak Chinese?",
+      "gold_sql": "SELECT COUNT( DISTINCT Continent) FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"Chinese\"",
+      "base_pred": "SELECT COUNT(DISTINCT T1.Continent) \nFROM country AS T1 \nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode \nWHERE T2.Language = 'Chinese';",
+      "finetuned_pred": "SELECT count(DISTINCT T1.Continent) FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  \"Chinese\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What are the regions that use English or Dutch?",
+      "gold_sql": "SELECT DISTINCT T1.Region FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" OR T2.Language  =  \"Dutch\"",
+      "base_pred": "SELECT DISTINCT T1.Region \nFROM country AS T1 \nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode \nWHERE T2.Language IN ('Dutch', 'English');",
+      "finetuned_pred": "SELECT T1.Region FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  'English' INTERSECT SELECT T1.Region FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  'Dutch'",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which regions speak Dutch or English?",
+      "gold_sql": "SELECT DISTINCT T1.Region FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" OR T2.Language  =  \"Dutch\"",
+      "base_pred": "SELECT DISTINCT T1.Region \nFROM country AS T1 \nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode \nWHERE T2.Language IN ('Dutch', 'English');",
+      "finetuned_pred": "SELECT T1.Region FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  'Dutch' INTERSECT SELECT T1.Region FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.IsOfficial  =  'TRUE' AND T2.Language  =  'English'",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which languages are spoken by only one country in republic governments?",
+      "gold_sql": "SELECT T2.Language FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.GovernmentForm  =  \"Republic\" GROUP BY T2.Language HAVING COUNT(*)  =  1",
+      "base_pred": "SELECT cl.Language\nFROM countrylanguage cl\nJOIN country c ON cl.CountryCode = c.Code\nWHERE c.GovernmentForm = 'Republic'\nGROUP BY cl.Language\nHAVING COUNT(DISTINCT cl.CountryCode) = 1;",
+      "finetuned_pred": "SELECT T1.Language FROM countrylanguage AS T1 JOIN country AS T2 ON T1.CountryCode  =  T2.Code WHERE T2.GovernmentForm  =  'republic' GROUP BY T1.Language HAVING COUNT(*)  =  1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What languages are only used by a single country with a republic government?",
+      "gold_sql": "SELECT T2.Language FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.GovernmentForm  =  \"Republic\" GROUP BY T2.Language HAVING COUNT(*)  =  1",
+      "base_pred": "SELECT cl.Language\nFROM countrylanguage cl\nJOIN country c ON cl.CountryCode = c.Code\nWHERE c.GovernmentForm = 'Republic'\nGROUP BY cl.Language\nHAVING COUNT(DISTINCT cl.CountryCode) = 1;",
+      "finetuned_pred": "SELECT T1.Language FROM countrylanguage AS T1 JOIN country AS T2 ON T1.CountryCode  =  T2.Code WHERE T2.GovernmentForm  =  'republic' GROUP BY T1.Language HAVING COUNT(*)  =  1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is average life expectancy in the countries where English is not the official language?",
+      "gold_sql": "SELECT avg(LifeExpectancy) FROM country WHERE Name NOT IN (SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" AND T2.IsOfficial  =  \"T\")",
+      "base_pred": "SELECT AVG(LifeExpectancy) \nFROM country \nWHERE Code NOT IN (\n    SELECT CountryCode \n    FROM countrylanguage \n    WHERE Language = 'English' AND IsOfficial = 'T'\n);",
+      "finetuned_pred": "SELECT avg(LifeExpectancy) FROM country WHERE code NOT IN ( SELECT countrycode FROM countrylanguage WHERE language  =  \"English\" AND isofficial  =  \"TRUE\")",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Give the mean life expectancy of countries in which English is not the official language.",
+      "gold_sql": "SELECT avg(LifeExpectancy) FROM country WHERE Name NOT IN (SELECT T1.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T2.Language  =  \"English\" AND T2.IsOfficial  =  \"T\")",
+      "base_pred": "SELECT AVG(LifeExpectancy) \nFROM country \nWHERE Code NOT IN (\n    SELECT CountryCode \n    FROM countrylanguage \n    WHERE Language = 'English' AND IsOfficial = 'T'\n);",
+      "finetuned_pred": "SELECT avg(LifeExpectancy) FROM country WHERE code NOT IN ( SELECT countrycode FROM countrylanguage WHERE LANGUAGE  =  \"English\" AND isofficial  =  'TRUE' )",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Return the different names of cities that are in Asia and for which Chinese is the official language.",
+      "gold_sql": "SELECT DISTINCT T3.Name FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode JOIN city AS T3 ON T1.Code  =  T3.CountryCode WHERE T2.IsOfficial  =  'T' AND T2.Language  =  'Chinese' AND T1.Continent  =  \"Asia\"",
+      "base_pred": "SELECT DISTINCT c.Name\nFROM city c\nJOIN country co ON c.CountryCode = co.Code\nJOIN countrylanguage cl ON co.Code = cl.CountryCode\nWHERE co.Continent = 'Asia' AND cl.Language = 'Chinese' AND cl.IsOfficial = 'T';",
+      "finetuned_pred": "SELECT DISTINCT T1.Name FROM city AS T1 JOIN country AS T2 ON T1.CountryCode  =  T2.Code JOIN countrylanguage AS T3 ON T2.Code  =  T3.CountryCode WHERE T2.Continent  =  'Asia' AND T3.IsOfficial  =  'TRUE' AND T3.Language  =  \"Chinese\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What are the population, name and leader of the country with the largest area?",
+      "gold_sql": "SELECT Name ,  population ,  HeadOfState FROM country ORDER BY SurfaceArea DESC LIMIT 1",
+      "base_pred": "SELECT Name, Population, HeadOfState FROM country ORDER BY SurfaceArea DESC LIMIT 1;",
+      "finetuned_pred": "SELECT population ,  name ,  headofstate FROM country ORDER BY surfacearea DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "Return the maximum and minimum shares for performances that do not have the type \"Live final\".",
+      "gold_sql": "SELECT max(SHARE) ,  min(SHARE) FROM performance WHERE TYPE != \"Live final\"",
+      "base_pred": "SELECT MAX(Share), MIN(Share) FROM performance WHERE Type != 'Live final';",
+      "finetuned_pred": "SELECT max(T1.Share) ,  min(T1.Share) FROM performance AS T1 JOIN show AS T2 ON T1.Performance_ID  =  T2.Performance_ID WHERE T1.Type != 'Live final'",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "How many orchestras does each record company manage?",
+      "gold_sql": "SELECT Record_Company ,  COUNT(*) FROM orchestra GROUP BY Record_Company",
+      "base_pred": "SELECT Record_Company, COUNT(*) AS Number_of_Orchestras\nFROM orchestra\nGROUP BY Record_Company;",
+      "finetuned_pred": "SELECT count(*) ,  record_company FROM orchestra GROUP BY record_company",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "Show the record companies shared by orchestras founded before 2003 and after 2003.",
+      "gold_sql": "SELECT Record_Company FROM orchestra WHERE Year_of_Founded  <  2003 INTERSECT SELECT Record_Company FROM orchestra WHERE Year_of_Founded  >  2003",
+      "base_pred": "SELECT Record_Company\nFROM orchestra\nWHERE Year_of_Founded < 2003\nINTERSECT\nSELECT Record_Company\nFROM orchestra\nWHERE Year_of_Founded > 2003;",
+      "finetuned_pred": "SELECT record_company FROM orchestra WHERE YEAR_OF_FOUNDEN < 2003 INTERSECT SELECT record_company FROM orchestra WHERE YEAR_OF_FOUNDEN > 2003",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "What are the record companies that are used by both orchestras founded before 2003 and those founded after 2003?",
+      "gold_sql": "SELECT Record_Company FROM orchestra WHERE Year_of_Founded  <  2003 INTERSECT SELECT Record_Company FROM orchestra WHERE Year_of_Founded  >  2003",
+      "base_pred": "SELECT Record_Company\nFROM orchestra\nWHERE Year_of_Founded < 2003\nINTERSECT\nSELECT Record_Company\nFROM orchestra\nWHERE Year_of_Founded > 2003;",
+      "finetuned_pred": "SELECT Record_Company FROM orchestra WHERE YEAR_OF_FOUND > 2003 INTERSECT SELECT Record_Company FROM orchestra WHERE YEAR_OF_FOUND < 2003",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Show the number of high schoolers for each grade.",
+      "gold_sql": "SELECT grade ,  count(*) FROM Highschooler GROUP BY grade",
+      "base_pred": "SELECT grade, COUNT(*) FROM Highschooler GROUP BY grade;",
+      "finetuned_pred": "SELECT count(*) ,  grade FROM Highschooler GROUP BY grade",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "How many high schoolers are in each grade?",
+      "gold_sql": "SELECT grade ,  count(*) FROM Highschooler GROUP BY grade",
+      "base_pred": "SELECT grade, COUNT(*) FROM Highschooler GROUP BY grade;",
+      "finetuned_pred": "SELECT count(*) ,  grade FROM Highschooler GROUP BY grade",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Show the student IDs and numbers of friends corresponding to each.",
+      "gold_sql": "SELECT student_id ,  count(*) FROM Friend GROUP BY student_id",
+      "base_pred": "SELECT student_id, COUNT(friend_id) AS number_of_friends FROM Friend GROUP BY student_id;",
+      "finetuned_pred": "SELECT T1.student_id ,  count(*) FROM Friend AS T1 JOIN Friend AS T2 ON T1.student_id = T2.friend_id AND T1.friend_id = T2.student_id GROUP BY T1.student_id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "How many friends does each student have?",
+      "gold_sql": "SELECT student_id ,  count(*) FROM Friend GROUP BY student_id",
+      "base_pred": "SELECT student_id, COUNT(friend_id) AS number_of_friends FROM Friend GROUP BY student_id;",
+      "finetuned_pred": "SELECT count(*) FROM friend",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Show the names of all of the high schooler Kyle's friends.",
+      "gold_sql": "SELECT T3.name FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id JOIN Highschooler AS T3 ON T1.friend_id  =  T3.id WHERE T2.name  =  \"Kyle\"",
+      "base_pred": "SELECT H2.name\nFROM Highschooler AS H1\nJOIN Friend AS F ON H1.ID = F.student_id\nJOIN Highschooler AS H2 ON F.friend_id = H2.ID\nWHERE H1.name = 'Kyle';",
+      "finetuned_pred": "SELECT T3.name FROM friend AS T1 JOIN highschooler AS T2 ON T1.friend_id  =  T2.id JOIN highschooler AS T3 ON T1.student_id  =  T3.id WHERE T2.name  =  \"Kyle\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Count the number of likes for each student id.",
+      "gold_sql": "SELECT student_id ,  count(*) FROM Likes GROUP BY student_id",
+      "base_pred": "SELECT student_id, COUNT(liked_id) AS like_count FROM Likes GROUP BY student_id;",
+      "finetuned_pred": "SELECT count(*) ,  student_id FROM Likes GROUP BY student_id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "How many likes correspond to each student id?",
+      "gold_sql": "SELECT student_id ,  count(*) FROM Likes GROUP BY student_id",
+      "base_pred": "SELECT student_id, COUNT(liked_id) AS like_count FROM Likes GROUP BY student_id;",
+      "finetuned_pred": "SELECT count(*) ,  student_id FROM Likes GROUP BY student_id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Find the average grade of all students who have some friends.",
+      "gold_sql": "SELECT avg(grade) FROM Highschooler WHERE id IN (SELECT T1.student_id FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id)",
+      "base_pred": "SELECT AVG(grade) \nFROM Highschooler \nWHERE ID IN (SELECT student_id FROM Friend);",
+      "finetuned_pred": "SELECT avg(T1.grade) FROM highschooler AS T1 JOIN friend AS T2 ON T1.id  =  T2.student_id GROUP BY T2.student_id HAVING count(*)  >  0",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "network_1",
+      "question": "What is the average grade of students who have friends?",
+      "gold_sql": "SELECT avg(grade) FROM Highschooler WHERE id IN (SELECT T1.student_id FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id)",
+      "base_pred": "SELECT AVG(grade) \nFROM Highschooler \nWHERE ID IN (SELECT student_id FROM Friend);",
+      "finetuned_pred": "SELECT avg(T1.grade) FROM highschooler AS T1 JOIN friend AS T2 ON T1.id  =  T2.student_id",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "Which professionals live in the state of Indiana or have done treatment on more than 2 treatments? List his or her id, last name and cell phone.",
+      "gold_sql": "SELECT professional_id ,  last_name ,  cell_number FROM Professionals WHERE state  =  'Indiana' UNION SELECT T1.professional_id ,  T1.last_name ,  T1.cell_number FROM Professionals AS T1 JOIN Treatments AS T2 ON T1.professional_id  =  T2.professional_id GROUP BY T1.professional_id HAVING count(*)  >  2",
+      "base_pred": "SELECT p.professional_id, p.last_name, p.cell_number\nFROM Professionals p\nWHERE p.state = 'Indiana'\nUNION\nSELECT p.professional_id, p.last_name, p.cell_number\nFROM Professionals p\nJOIN Treatments t ON p.professional_id = t.professional_id\nGROUP BY p.professional_id, p.last_name, p.cell_number\nHAVING COUNT(t.treatment_id) > 2;",
+      "finetuned_pred": "SELECT T1.professional_id ,  T1.last_name ,  T1.cell_number FROM professionals AS T1 JOIN treatments AS T2 ON T1.professional_id  =  T2.professional_id WHERE T1.state  =  \"Indiana\" GROUP BY T1.professional_id HAVING count(*)  >  2",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "Find the id, last name and cell phone of the professionals who live in the state of Indiana or have performed more than two treatments.",
+      "gold_sql": "SELECT professional_id ,  last_name ,  cell_number FROM Professionals WHERE state  =  'Indiana' UNION SELECT T1.professional_id ,  T1.last_name ,  T1.cell_number FROM Professionals AS T1 JOIN Treatments AS T2 ON T1.professional_id  =  T2.professional_id GROUP BY T1.professional_id HAVING count(*)  >  2",
+      "base_pred": "SELECT p.professional_id, p.last_name, p.cell_number\nFROM Professionals p\nWHERE p.state = 'Indiana'\nUNION\nSELECT p.professional_id, p.last_name, p.cell_number\nFROM Professionals p\nJOIN Treatments t ON p.professional_id = t.professional_id\nGROUP BY p.professional_id, p.last_name, p.cell_number\nHAVING COUNT(t.treatment_id) > 2;",
+      "finetuned_pred": "SELECT T1.professional_id ,  T1.last_name ,  T1.cell_number FROM professionals AS T1 JOIN treatments AS T2 ON T1.professional_id  =  T2.professional_id WHERE T1.state  =  \"Indiana\" GROUP BY T1.professional_id HAVING count(*)  >  2",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "Which first names are used for professionals or owners but are not used as dog names?",
+      "gold_sql": "SELECT first_name FROM Professionals UNION SELECT first_name FROM Owners EXCEPT SELECT name FROM Dogs",
+      "base_pred": "SELECT DISTINCT first_name \nFROM Owners \nUNION \nSELECT DISTINCT first_name \nFROM Professionals \nEXCEPT \nSELECT DISTINCT name \nFROM Dogs;",
+      "finetuned_pred": "SELECT DISTINCT first_name FROM owners EXCEPT SELECT DISTINCT name FROM dogs",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "Which professionals have done at least two treatments? List the professional's id, role, and first name.",
+      "gold_sql": "SELECT T1.professional_id ,  T1.role_code ,  T1.first_name FROM Professionals AS T1 JOIN Treatments AS T2 ON T1.professional_id  =  T2.professional_id GROUP BY T1.professional_id HAVING count(*)  >=  2",
+      "base_pred": "SELECT p.professional_id, p.role_code, p.first_name\nFROM Professionals p\nJOIN Treatments t ON p.professional_id = t.professional_id\nGROUP BY p.professional_id, p.role_code, p.first_name\nHAVING COUNT(t.treatment_id) >= 2;",
+      "finetuned_pred": "SELECT T1.professional_id ,  T2.role_code ,  T3.first_name FROM treatments AS T1 JOIN treatment_types AS T2 ON T1.treatment_type_code = T2.treatment_type_code JOIN professionals AS T3 ON T1.professional_id = T3.professional_id GROUP BY T1.professional_id HAVING count(*)  >=  2;",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "What are the id, role, and first name of the professionals who have performed two or more treatments?",
+      "gold_sql": "SELECT T1.professional_id ,  T1.role_code ,  T1.first_name FROM Professionals AS T1 JOIN Treatments AS T2 ON T1.professional_id  =  T2.professional_id GROUP BY T1.professional_id HAVING count(*)  >=  2",
+      "base_pred": "SELECT p.professional_id, p.role_code, p.first_name\nFROM Professionals p\nJOIN Treatments t ON p.professional_id = t.professional_id\nGROUP BY p.professional_id, p.role_code, p.first_name\nHAVING COUNT(t.treatment_id) >= 2;",
+      "finetuned_pred": "SELECT T1.professional_id ,  T2.role_code ,  T1.first_name FROM owners AS T1 JOIN professionals AS T2 ON T1.owner_id  =  T2.professional_id JOIN treatments AS T3 ON T1.owner_id  =  T3.dog_id GROUP BY T1.professional_id HAVING count(*)  >=  2",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "List the cost of each treatment and the corresponding treatment type description.",
+      "gold_sql": "SELECT T1.cost_of_treatment ,  T2.treatment_type_description FROM Treatments AS T1 JOIN treatment_types AS T2 ON T1.treatment_type_code  =  T2.treatment_type_code",
+      "base_pred": "SELECT T1.cost_of_treatment, T3.treatment_type_description \nFROM Treatments AS T1 \nJOIN Treatment_Types AS T3 ON T1.treatment_type_code = T3.treatment_type_code;",
+      "finetuned_pred": "SELECT T1.charge_amount ,  T2.treatment_type_description FROM charges AS T1 JOIN treatment_types AS T2 ON T1.charge_id  =  T2.treatment_type_code",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "What are the cost and treatment type description of each treatment?",
+      "gold_sql": "SELECT T1.cost_of_treatment ,  T2.treatment_type_description FROM Treatments AS T1 JOIN treatment_types AS T2 ON T1.treatment_type_code  =  T2.treatment_type_code",
+      "base_pred": "SELECT T1.cost_of_treatment, T3.treatment_type_description \nFROM Treatments AS T1 \nJOIN Treatment_Types AS T3 ON T1.treatment_type_code = T3.treatment_type_code;",
+      "finetuned_pred": "SELECT T1.charge_amount ,  T2.treatment_type_description FROM charges AS T1 JOIN treatment_types AS T2 ON T1.charge_id  =  T2.treatment_type_code",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "List the emails of the professionals who live in the state of Hawaii or the state of Wisconsin.",
+      "gold_sql": "SELECT email_address FROM Professionals WHERE state  =  'Hawaii' OR state  =  'Wisconsin'",
+      "base_pred": "SELECT email_address \nFROM Professionals \nWHERE state IN ('Hawaii', 'Wisconsin');",
+      "finetuned_pred": "SELECT email_address FROM owners WHERE state = \"Hawaii\" OR state = \"Wisconsin\";",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "What are the emails of the professionals living in either the state of Hawaii or the state of Wisconsin?",
+      "gold_sql": "SELECT email_address FROM Professionals WHERE state  =  'Hawaii' OR state  =  'Wisconsin'",
+      "base_pred": "SELECT email_address \nFROM Professionals \nWHERE state IN ('Hawaii', 'Wisconsin');",
+      "finetuned_pred": "SELECT email_address FROM owners WHERE state = \"Hawaii\" UNION SELECT email_address FROM owners WHERE state = \"Wisconsin\"",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "What is the charge amount of the most expensive charge type?",
+      "gold_sql": "SELECT max(charge_amount) FROM Charges",
+      "base_pred": "SELECT MAX(charge_amount) AS max_charge_amount FROM Charges;",
+      "finetuned_pred": "SELECT charge_amount FROM charges WHERE charge_type  =  ( SELECT MAX(charge_amount) FROM charges )",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "What are all the possible breed type and size type combinations?",
+      "gold_sql": "SELECT DISTINCT breed_code ,  size_code FROM dogs",
+      "base_pred": "SELECT DISTINCT breed_code, size_code FROM Dogs;",
+      "finetuned_pred": "SELECT T1.breed_name ,  T2.size_description FROM breeds AS T1 JOIN sizes AS T2 ON T1.breed_code = T2.size_code;",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "Find the distinct breed type and size type combinations for dogs.",
+      "gold_sql": "SELECT DISTINCT breed_code ,  size_code FROM dogs",
+      "base_pred": "SELECT DISTINCT breed_code, size_code FROM Dogs;",
+      "finetuned_pred": "SELECT DISTINCT T1.breed_type ,  T2.size_description FROM Breeds AS T1 JOIN Sizes AS T2 ON T1.breed_code = T2.size_code",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "singer",
+      "question": "For each singer name, what is the total sales for their songs?",
+      "gold_sql": "SELECT T1.Name ,  sum(T2.Sales) FROM singer AS T1 JOIN song AS T2 ON T1.Singer_ID  =  T2.Singer_ID GROUP BY T1.Name",
+      "base_pred": "SELECT s.Name, SUM(so.Sales) AS Total_Sales\nFROM singer s\nJOIN song so ON s.Singer_ID = so.Singer_ID\nGROUP BY s.Name;",
+      "finetuned_pred": "SELECT sum(T2.sales) ,  T1.name FROM singer AS T1 JOIN song AS T2 ON T1.singer_id  =  T2.singer_id GROUP BY T1.name",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "real_estate_properties",
+      "question": "What is the feature type name of feature AirCon?",
+      "gold_sql": "SELECT T2.feature_type_name FROM Other_Available_Features AS T1 JOIN Ref_Feature_Types AS T2 ON T1.feature_type_code  =  T2.feature_type_code WHERE T1.feature_name  =  \"AirCon\"",
+      "base_pred": "SELECT ft.feature_type_name \nFROM Ref_Feature_Types ft \nJOIN Other_Available_Features oaf ON ft.feature_type_code = oaf.feature_type_code \nWHERE oaf.feature_name = 'AirCon';",
+      "finetuned_pred": "SELECT T1.property_type_name FROM Ref_Feature_Types AS T1 JOIN Other_Available_Features AS T2 ON T1.feature_type_code  =  T2.feature_type_code WHERE T2.feature_name  =  \"AirCon\"",
+      "difficulty": "easy"
+    }
+  ],
+  "improvements": [
+    {
+      "db_id": "concert_singer",
+      "question": "Show countries where a singer above age 40 and a singer below 30 are from.",
+      "gold_sql": "SELECT country FROM singer WHERE age  >  40 INTERSECT SELECT country FROM singer WHERE age  <  30",
+      "base_pred": "SELECT DISTINCT Country \nFROM singer \nWHERE Age > 40 OR Age < 30;",
+      "finetuned_pred": "SELECT country FROM singer WHERE age  >  40 INTERSECT SELECT country FROM singer WHERE age  <  30",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the maximum weight for each type of pet. List the maximum weight and pet type.",
+      "gold_sql": "SELECT max(weight) ,  petType FROM pets GROUP BY petType",
+      "base_pred": "SELECT PetType, MAX(weight) AS MaxWeight\nFROM Pets\nGROUP BY PetType;",
+      "finetuned_pred": "SELECT max(weight) ,  pettype FROM pets GROUP BY pettype",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "List the maximum weight and type for each type of pet.",
+      "gold_sql": "SELECT max(weight) ,  petType FROM pets GROUP BY petType",
+      "base_pred": "SELECT PetType, MAX(weight) AS MaxWeight\nFROM Pets\nGROUP BY PetType;",
+      "finetuned_pred": "SELECT max(weight) ,  pettype FROM pets GROUP BY pettype",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the number of dog pets that are raised by female students (with sex F).",
+      "gold_sql": "SELECT count(*) FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T2.petid  =  T3.petid WHERE T1.sex  =  'F' AND T3.pettype  =  'dog'",
+      "base_pred": "SELECT COUNT(*) \nFROM Has_Pet HP\nJOIN Pets P ON HP.PetID = P.PetID\nJOIN Student S ON HP.StuID = S.StuID\nWHERE P.PetType = 'dog' AND S.Sex = 'female';",
+      "finetuned_pred": "SELECT count(*) FROM has_pet AS T1 JOIN student AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T1.petid  =  T3.petid WHERE T2.sex  =  'F' AND T3.pettype  =  \"dog\"",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "How many dog pets are raised by female students?",
+      "gold_sql": "SELECT count(*) FROM student AS T1 JOIN has_pet AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T2.petid  =  T3.petid WHERE T1.sex  =  'F' AND T3.pettype  =  'dog'",
+      "base_pred": "SELECT COUNT(*) \nFROM Has_Pet HP\nJOIN Pets P ON HP.PetID = P.PetID\nJOIN Student S ON HP.StuID = S.StuID\nWHERE P.PetType = 'dog' AND S.Sex = 'female';",
+      "finetuned_pred": "SELECT count(*) FROM has_pet AS T1 JOIN student AS T2 ON T1.stuid  =  T2.stuid JOIN pets AS T3 ON T1.petid  =  T3.petid WHERE T2.sex  =  'F' AND T3.pettype  =  \"dog\";",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "Find the average weight for each pet type.",
+      "gold_sql": "SELECT avg(weight) ,  pettype FROM pets GROUP BY pettype",
+      "base_pred": "SELECT Pets.PetType, AVG(Pets.weight) AS AverageWeight\nFROM Pets\nJOIN Has_Pet ON Pets.PetID = Has_Pet.PetID\nGROUP BY Pets.PetType;",
+      "finetuned_pred": "SELECT avg(weight) ,  pettype FROM pets GROUP BY pettype",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "pets_1",
+      "question": "What is the average weight for each type of pet?",
+      "gold_sql": "SELECT avg(weight) ,  pettype FROM pets GROUP BY pettype",
+      "base_pred": "SELECT Pets.PetType, AVG(Pets.weight) AS AverageWeight\nFROM Pets\nJOIN Has_Pet ON Pets.PetID = Has_Pet.PetID\nGROUP BY Pets.PetType;",
+      "finetuned_pred": "SELECT avg(weight) ,  pettype FROM pets GROUP BY pettype",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "How many models does each car maker produce? List maker full name, id and the number.",
+      "gold_sql": "SELECT T1.FullName ,  T1.Id ,  count(*) FROM CAR_MAKERS AS T1 JOIN MODEL_LIST AS T2 ON T1.Id  =  T2.Maker GROUP BY T1.Id;",
+      "base_pred": "SELECT cm.Maker, cm.FullName, cm.Id, COUNT(ml.Model) AS NumberOfModels\nFROM car_makers cm\nJOIN model_list ml ON cm.Id = ml.Maker\nGROUP BY cm.Maker, cm.FullName, cm.Id;",
+      "finetuned_pred": "SELECT T1.FullName ,  T2.Maker ,  count(*) FROM car_makers AS T1 JOIN model_list AS T2 ON T1.id  =  T2.Maker GROUP BY T2.Maker",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "How many car makers are there in france?",
+      "gold_sql": "SELECT count(*) FROM CAR_MAKERS AS T1 JOIN COUNTRIES AS T2 ON T1.Country  =  T2.CountryId WHERE T2.CountryName  =  'france';",
+      "base_pred": "SELECT COUNT(*) \nFROM car_makers \nJOIN countries ON car_makers.Country = countries.CountryId \nWHERE countries.CountryName = 'France';",
+      "finetuned_pred": "SELECT COUNT(*) FROM car_makers AS T1 JOIN countries AS T2 ON T1.Country  =  T2.CountryId WHERE T2.CountryName  =  \"france\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "What is the average edispl of the cars of model volvo?",
+      "gold_sql": "SELECT avg(T2.edispl) FROM CAR_NAMES AS T1 JOIN CARS_DATA AS T2 ON T1.MakeId  =  T2.Id WHERE T1.Model  =  'volvo';",
+      "base_pred": "SELECT AVG(cars_data.Edispl) \nFROM cars_data \nJOIN car_names ON cars_data.MakeId = car_names.MakeId \nWHERE car_names.Make = 'VOLVO';",
+      "finetuned_pred": "SELECT avg(T1.Edispl) FROM cars_data AS T1 JOIN car_names AS T2 ON T1.id  =  T2.makeid WHERE T2.model  =  \"volvo\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "Which model has the most version(make) of cars?",
+      "gold_sql": "SELECT Model FROM CAR_NAMES GROUP BY Model ORDER BY count(*) DESC LIMIT 1;",
+      "base_pred": "SELECT Model \nFROM model_list \nGROUP BY Model \nORDER BY COUNT(DISTINCT MakeId) DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Model FROM model_list AS T1 JOIN car_names AS T2 ON T1.Model  =  T2.Model GROUP BY T1.Model ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "How many car models were produced by the maker with full name American Motor Company?",
+      "gold_sql": "SELECT count(*) FROM CAR_MAKERS AS T1 JOIN MODEL_LIST AS T2 ON T1.Id  =  T2.Maker WHERE T1.FullName  =  'American Motor Company';",
+      "base_pred": "SELECT COUNT(*) \nFROM car_makers cm\nJOIN model_list ml ON cm.Id = ml.Maker\nWHERE cm.Maker = 'American Motor Company';",
+      "finetuned_pred": "SELECT count(*) FROM car_makers AS T1 JOIN model_list AS T2 ON T1.id = T2.Maker WHERE T1.fullname = \"American Motor Company\";",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "Which makers designed more than 3 car models? List full name and the id.",
+      "gold_sql": "SELECT T1.FullName ,  T1.Id FROM CAR_MAKERS AS T1 JOIN MODEL_LIST AS T2 ON T1.Id  =  T2.Maker GROUP BY T1.Id HAVING count(*)  >  3;",
+      "base_pred": "SELECT cm.Maker, cm.Id \nFROM car_makers cm \nJOIN model_list ml ON cm.Id = ml.Maker \nGROUP BY cm.Maker, cm.Id \nHAVING COUNT(ml.Model) > 3;",
+      "finetuned_pred": "SELECT T1.FullName ,  T2.Maker FROM car_makers AS T1 JOIN model_list AS T2 ON T1.id  =  T2.Maker GROUP BY T2.Maker HAVING COUNT(*)  >  3",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "For model volvo, how many cylinders does the car with the least accelerate have?",
+      "gold_sql": "SELECT T1.cylinders FROM CARS_DATA AS T1 JOIN CAR_NAMES AS T2 ON T1.Id  =  T2.MakeId WHERE T2.Model  =  'volvo' ORDER BY T1.accelerate ASC LIMIT 1;",
+      "base_pred": "SELECT MIN(T1.Cylinders) \nFROM cars_data AS T1 \nJOIN car_names AS T2 ON T1.Id = T2.MakeId \nJOIN model_list AS T3 ON T2.Model = T3.Model \nWHERE T3.Maker = 'Volvo';",
+      "finetuned_pred": "SELECT T1.Cylinders FROM cars_data AS T1 JOIN car_names AS T2 ON T1.id  =  T2.makeid WHERE T2.model  =  'volvo' ORDER BY T1.accelerate LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "For a volvo model, how many cylinders does the version with least accelerate have?",
+      "gold_sql": "SELECT T1.cylinders FROM CARS_DATA AS T1 JOIN CAR_NAMES AS T2 ON T1.Id  =  T2.MakeId WHERE T2.Model  =  'volvo' ORDER BY T1.accelerate ASC LIMIT 1;",
+      "base_pred": "SELECT MIN(T1.Cylinders) \nFROM cars_data AS T1 \nJOIN car_names AS T2 ON T1.Id = T2.MakeId \nJOIN model_list AS T3 ON T2.Model = T3.Model \nWHERE T3.Maker = 'Volvo';",
+      "finetuned_pred": "SELECT T1.Cylinders FROM cars_data AS T1 JOIN car_names AS T2 ON T1.id  =  T2.makeid WHERE T2.model  =  \"volvo\" ORDER BY T1.accelerate LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "car_1",
+      "question": "What are the ids and names of all countries that either have more than 3 car makers or produce fiat model ?",
+      "gold_sql": "select t1.countryid ,  t1.countryname from countries as t1 join car_makers as t2 on t1.countryid  =  t2.country group by t1.countryid having count(*)  >  3 union select t1.countryid ,  t1.countryname from countries as t1 join car_makers as t2 on t1.countryid  =  t2.country join model_list as t3 on t2.id  =  t3.maker where t3.model  =  'fiat';",
+      "base_pred": "SELECT c.CountryId, c.CountryName\nFROM countries c\nWHERE (\n    SELECT COUNT(*) FROM car_makers cm WHERE cm.Country = c.CountryId\n) > 3\nOR EXISTS (\n    SELECT 1 FROM car_names cn JOIN model_list ml ON cn.Model = ml.ModelId WHERE cn.Make = 'Fiat' AND cn.MakeId = c.CountryId\n);",
+      "finetuned_pred": "SELECT T1.CountryId ,  T1.CountryName FROM countries AS T1 JOIN car_makers AS T2 ON T1.CountryId  =  T2.Country GROUP BY T1.CountryName HAVING COUNT(*)  >  3 UNION SELECT DISTINCT T4.CountryId ,  T4.CountryName FROM countries AS T4 JOIN car_makers AS T5 ON T4.CountryId  =  T5.Country JOIN model_list AS T6 ON T5.id  =  T6.Maker JOIN car_names AS T7 ON T6.Model  =  T7.Model WHERE T7.Model  =  \"fiat\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Find all airlines that have flights from both airports 'APG' and 'CVO'.",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"APG\" INTERSECT SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"CVO\"",
+      "base_pred": "SELECT DISTINCT a.Airline, a.Airport\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nJOIN airports s ON f.SourceAirport = s.AirportCode\nWHERE s.City IN ('APG', 'CVO')\nGROUP BY a.Airline, a.Airport\nHAVING COUNT(DISTINCT s.City) > 1;",
+      "finetuned_pred": "SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  'APG' INTERSECT SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  'CVO'",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Which airlines have departing flights from both APG and CVO airports?",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"APG\" INTERSECT SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"CVO\"",
+      "base_pred": "SELECT DISTINCT a.Airline, a.Airport\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nJOIN airports s ON f.SourceAirport = s.AirportCode\nWHERE s.City IN ('APG', 'CVO')\nGROUP BY a.Airline, a.Airport\nHAVING COUNT(DISTINCT s.City) > 1;",
+      "finetuned_pred": "SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"APG\" INTERSECT SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"CVO\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Find all airlines that have flights from airport 'CVO' but not from 'APG'.",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"CVO\" EXCEPT SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"APG\"",
+      "base_pred": "SELECT DISTINCT a.Airline, a.Airport, a.Abbreviation, a.Country\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nJOIN airports s ON f.SourceAirport = s.AirportCode\nWHERE s.City = 'CVO'\nAND f.DestAirport NOT IN (\n    SELECT f2.DestAirport\n    FROM flights f2\n    JOIN airports d ON f2.DestAirport = d.AirportCode\n    WHERE d.City = 'APG'\n);",
+      "finetuned_pred": "SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  'CVO' EXCEPT SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  'APG'",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Which airlines have departures from CVO but not from APG airports?",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"CVO\" EXCEPT SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"APG\"",
+      "base_pred": "SELECT DISTINCT a.Airline, a.Airport, a.Abbreviation, a.Country\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nJOIN airports s ON f.SourceAirport = s.AirportCode\nWHERE s.City = 'CVO'\nAND f.DestAirport NOT IN (\n    SELECT f2.DestAirport\n    FROM flights f2\n    JOIN airports d ON f2.DestAirport = d.AirportCode\n    WHERE d.City = 'APG'\n);",
+      "finetuned_pred": "SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"CVO\" EXCEPT SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline WHERE T2.SourceAirport  =  \"APG\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Find all airlines that have at least 10 flights.",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline GROUP BY T1.Airline HAVING count(*)  >  10",
+      "base_pred": "SELECT a.Airline, COUNT(f.FlightNo) AS NumberOfFlights\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nGROUP BY a.Airline\nHAVING COUNT(f.FlightNo) >= 10;",
+      "finetuned_pred": "SELECT T2.Airline FROM flights AS T1 JOIN airlines AS T2 ON T1.Airline  =  T2.uid GROUP BY T2.Airline HAVING count(*)  >=  10",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Which airlines have at least 10 flights?",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline GROUP BY T1.Airline HAVING count(*)  >  10",
+      "base_pred": "SELECT a.Airline, COUNT(f.FlightNo) AS NumberOfFlights\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nGROUP BY a.Airline\nHAVING COUNT(f.FlightNo) >= 10;",
+      "finetuned_pred": "SELECT T2.Airline FROM flights AS T1 JOIN airlines AS T2 ON T1.Airline  =  T2.uid GROUP BY T1.Airline HAVING count(*)  >=  10",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Find all airlines that have fewer than 200 flights.",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline GROUP BY T1.Airline HAVING count(*)  <  200",
+      "base_pred": "SELECT a.Airline, COUNT(f.FlightNo) AS NumberOfFlights\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nGROUP BY a.Airline\nHAVING COUNT(f.FlightNo) < 200;",
+      "finetuned_pred": "SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline GROUP BY T2.Airline HAVING count(*)  <  200",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "flight_2",
+      "question": "Which airlines have less than 200 flights?",
+      "gold_sql": "SELECT T1.Airline FROM AIRLINES AS T1 JOIN FLIGHTS AS T2 ON T1.uid  =  T2.Airline GROUP BY T1.Airline HAVING count(*)  <  200",
+      "base_pred": "SELECT a.Airline, COUNT(f.FlightNo) AS NumberOfFlights\nFROM airlines a\nJOIN flights f ON a.uid = f.Airline\nGROUP BY a.Airline\nHAVING COUNT(f.FlightNo) < 200;",
+      "finetuned_pred": "SELECT T1.Airline FROM airlines AS T1 JOIN flights AS T2 ON T1.uid  =  T2.Airline GROUP BY T2.Airline HAVING count(*)  <  200",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "employee_hire_evaluation",
+      "question": "What is the number of employees from each city?",
+      "gold_sql": "SELECT count(*) ,  city FROM employee GROUP BY city",
+      "base_pred": "SELECT e.City, COUNT(e.Employee_ID) AS Number_of_Employees\nFROM employee e\nGROUP BY e.City;",
+      "finetuned_pred": "SELECT count(*) ,  city FROM employee GROUP BY city",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "employee_hire_evaluation",
+      "question": "Count the number of employees for each city.",
+      "gold_sql": "SELECT count(*) ,  city FROM employee GROUP BY city",
+      "base_pred": "SELECT e.City, COUNT(e.Employee_ID) AS Number_of_Employees\nFROM employee e\nGROUP BY e.City;",
+      "finetuned_pred": "SELECT count(*) ,  city FROM employee GROUP BY city",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "employee_hire_evaluation",
+      "question": "Find the number of shops in each location.",
+      "gold_sql": "SELECT count(*) ,  LOCATION FROM shop GROUP BY LOCATION",
+      "base_pred": "SELECT Location, COUNT(*) AS Number_of_Shops FROM shop GROUP BY Location;",
+      "finetuned_pred": "SELECT count(*) ,  LOCATION FROM shop GROUP BY LOCATION",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "employee_hire_evaluation",
+      "question": "How many shops are there in each location?",
+      "gold_sql": "SELECT count(*) ,  LOCATION FROM shop GROUP BY LOCATION",
+      "base_pred": "SELECT Location, COUNT(*) AS Number_of_Shops FROM shop GROUP BY Location;",
+      "finetuned_pred": "SELECT count(*) ,  LOCATION FROM shop GROUP BY LOCATION",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "employee_hire_evaluation",
+      "question": "For each shop, return the number of employees working there and the name of the shop.",
+      "gold_sql": "SELECT count(*) ,  t2.name FROM hiring AS t1 JOIN shop AS t2 ON t1.shop_id  =  t2.shop_id GROUP BY t2.name",
+      "base_pred": "SELECT s.Name AS Shop_Name, COUNT(h.Employee_ID) AS Number_of_Employees\nFROM shop s\nJOIN hiring h ON s.Shop_ID = h.Shop_ID\nGROUP BY s.Name;",
+      "finetuned_pred": "SELECT count(*) ,  T1.name FROM shop AS T1 JOIN hiring AS T2 ON T1.shop_id  =  T2.shop_id GROUP BY T1.name",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "How many documents are using the template with type code 'PPT'?",
+      "gold_sql": "SELECT count(*) FROM Documents AS T1 JOIN Templates AS T2 ON T1.Template_ID  =  T2.Template_ID WHERE T2.Template_Type_Code  =  'PPT'",
+      "base_pred": "SELECT COUNT(Documents.Document_ID)\nFROM Documents\nJOIN Templates ON Documents.Template_ID = Templates.Template_ID\nJOIN Ref_Template_Types ON Templates.Template_Type_Code = Ref_Template_Types.Template_Type_Code\nWHERE Ref_Template_Types.Template_Type_Description = 'PPT';",
+      "finetuned_pred": "SELECT count(*) FROM templates AS t JOIN documents AS d ON t.template_id  =  d.template_id WHERE t.template_type_code  =  \"PPT\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "Count the number of documents that use the PPT template type.",
+      "gold_sql": "SELECT count(*) FROM Documents AS T1 JOIN Templates AS T2 ON T1.Template_ID  =  T2.Template_ID WHERE T2.Template_Type_Code  =  'PPT'",
+      "base_pred": "SELECT COUNT(Documents.Document_ID)\nFROM Documents\nJOIN Templates ON Documents.Template_ID = Templates.Template_ID\nJOIN Ref_Template_Types ON Templates.Template_Type_Code = Ref_Template_Types.Template_Type_Code\nWHERE Ref_Template_Types.Template_Type_Description = 'PPT';",
+      "finetuned_pred": "SELECT count(*) FROM templates AS t JOIN documents AS d ON t.template_id  =  d.template_id WHERE t.template_type_code  =  \"PPT\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "What is the id and type code for the template used by the most documents?",
+      "gold_sql": "SELECT T1.template_id ,  T2.Template_Type_Code FROM Documents AS T1 JOIN Templates AS T2 ON T1.template_id  =  T2.template_id GROUP BY T1.template_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT T1.Template_ID, T1.Template_Type_Code \nFROM Templates AS T1 \nJOIN Documents AS T2 ON T1.Template_ID = T2.Template_ID \nGROUP BY T1.Template_ID, T1.Template_Type_Code \nORDER BY COUNT(T2.Document_ID) DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.template_id ,  T2.template_type_code FROM templates AS T1 JOIN ref_template_types AS T2 ON T1.template_type_code  =  T2.template_type_code JOIN documents AS T3 ON T1.template_id  =  T3.template_id GROUP BY T1.template_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "Return the id and type code of the template that is used for the greatest number of documents.",
+      "gold_sql": "SELECT T1.template_id ,  T2.Template_Type_Code FROM Documents AS T1 JOIN Templates AS T2 ON T1.template_id  =  T2.template_id GROUP BY T1.template_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT T1.Template_ID, T1.Template_Type_Code \nFROM Templates AS T1 \nJOIN Documents AS T2 ON T1.Template_ID = T2.Template_ID \nGROUP BY T1.Template_ID, T1.Template_Type_Code \nORDER BY COUNT(T2.Document_ID) DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.template_id ,  T2.template_type_code FROM templates AS T1 JOIN ref_template_types AS T2 ON T1.template_type_code  =  T2.template_type_code JOIN documents AS T3 ON T1.template_id  =  T3.template_id GROUP BY T1.template_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "Return the different descriptions for templates that have been used in a document.",
+      "gold_sql": "SELECT DISTINCT T1.template_type_description FROM Ref_template_types AS T1 JOIN Templates AS T2 ON T1.template_type_code  = T2.template_type_code JOIN Documents AS T3 ON T2.Template_ID  =  T3.template_ID",
+      "base_pred": "SELECT DISTINCT T1.Template_Description \nFROM Ref_Template_Types AS T1 \nJOIN Templates AS T2 ON T1.Template_Type_Code = T2.Template_Type_Code \nJOIN Documents AS T3 ON T2.Template_ID = T3.Template_ID;",
+      "finetuned_pred": "SELECT DISTINCT t1.template_type_description FROM ref_template_types AS t1 JOIN templates AS t2 ON t1.template_type_code  =  t2.template_type_code WHERE t2.template_id IN ( SELECT template_id FROM documents )",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "Show the document id with paragraph text 'Brazil' and 'Ireland'.",
+      "gold_sql": "SELECT document_id FROM Paragraphs WHERE paragraph_text  =  'Brazil' INTERSECT SELECT document_id FROM Paragraphs WHERE paragraph_text  =  'Ireland'",
+      "base_pred": "SELECT Document_ID \nFROM Paragraphs \nWHERE Paragraph_Text LIKE '%Brazil%' AND Paragraph_Text LIKE '%Ireland%';",
+      "finetuned_pred": "SELECT document_id FROM Paragraphs WHERE paragraph_text  =  \"Brazil\" INTERSECT SELECT document_id FROM Paragraphs WHERE paragraph_text  =  \"Ireland\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "cre_Doc_Template_Mgt",
+      "question": "What are the ids of documents that contain the paragraph text 'Brazil' and 'Ireland'?",
+      "gold_sql": "SELECT document_id FROM Paragraphs WHERE paragraph_text  =  'Brazil' INTERSECT SELECT document_id FROM Paragraphs WHERE paragraph_text  =  'Ireland'",
+      "base_pred": "SELECT Document_ID \nFROM Paragraphs \nWHERE Paragraph_Text LIKE '%Brazil%' AND Paragraph_Text LIKE '%Ireland%';",
+      "finetuned_pred": "SELECT document_id FROM paragraphs WHERE paragraph_text  =  'Brazil' INTERSECT SELECT document_id FROM paragraphs WHERE paragraph_text  =  'Ireland'",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "course_teach",
+      "question": "List the most common hometown of teachers.",
+      "gold_sql": "SELECT Hometown FROM teacher GROUP BY Hometown ORDER BY COUNT(*) DESC LIMIT 1",
+      "base_pred": "SELECT Hometown, COUNT(*) AS Count\nFROM teacher\nGROUP BY Hometown\nORDER BY Count DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT Hometown FROM teacher GROUP BY Hometown ORDER BY COUNT(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "course_teach",
+      "question": "What is the most commmon hometowns for teachers?",
+      "gold_sql": "SELECT Hometown FROM teacher GROUP BY Hometown ORDER BY COUNT(*) DESC LIMIT 1",
+      "base_pred": "SELECT Hometown, COUNT(*) AS Count\nFROM teacher\nGROUP BY Hometown\nORDER BY Count DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT Hometown FROM teacher GROUP BY Hometown ORDER BY COUNT(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "museum_visit",
+      "question": "Find the number of visitors who did not visit any museum opened after 2010.",
+      "gold_sql": "SELECT count(*) FROM visitor WHERE id NOT IN (SELECT t2.visitor_id FROM museum AS t1 JOIN visit AS t2 ON t1.Museum_ID  =  t2.Museum_ID WHERE t1.open_year  >  2010)",
+      "base_pred": "SELECT COUNT(DISTINCT visitor_ID)\nFROM visit\nWHERE visitor_ID NOT IN (\n    SELECT v.ID\n    FROM visitor v\n    JOIN visit vi ON v.ID = vi.visitor_ID\n    JOIN museum m ON vi.Museum_ID = m.Museum_ID\n    WHERE m.Open_Year > '2010'\n);",
+      "finetuned_pred": "SELECT count(*) FROM visitor WHERE id NOT IN ( SELECT T1.id FROM visitor AS T1 JOIN visit AS T2 ON T1.id  =  T2.visitor_id JOIN museum AS T3 ON T2.museum_id  =  T3.museum_id WHERE T3.open_year  >  2010 )",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "What are the country code and first name of the players who won in both tourney WTA Championships and Australian Open?",
+      "gold_sql": "SELECT T1.country_code ,  T1.first_name FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id WHERE T2.tourney_name  =  'WTA Championships' INTERSECT SELECT T1.country_code ,  T1.first_name FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id WHERE T2.tourney_name  =  'Australian Open'",
+      "base_pred": "SELECT p.first_name, p.country_code\nFROM players p\nWHERE p.player_id IN (\n    SELECT m.winner_id\n    FROM matches m\n    WHERE m.tourney_name IN ('WTA Championships', 'Australian Open')\n)\nGROUP BY p.player_id, p.first_name, p.country_code\nHAVING COUNT(DISTINCT m.tourney_name) = 2;",
+      "finetuned_pred": "SELECT T1.country_code ,  T1.first_name FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id WHERE T2.tourney_name  =  'Australian Open' INTERSECT SELECT T1.country_code ,  T1.first_name FROM players AS T1 JOIN matches AS T2 ON T1.player_id  =  T2.winner_id WHERE T2.tourney_name  =  'WTA Championships'",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the total ranking points for each player and their first name.",
+      "gold_sql": "SELECT sum(ranking_points) ,  T1.first_name FROM players AS T1 JOIN rankings AS T2 ON T1.player_id  =  T2.player_id GROUP BY T1.first_name",
+      "base_pred": "SELECT p.first_name, SUM(r.ranking_points) AS total_ranking_points\nFROM players p\nJOIN rankings r ON p.player_id = r.player_id\nGROUP BY p.player_id, p.first_name;",
+      "finetuned_pred": "SELECT sum(T2.ranking_points) ,  T1.first_name FROM players AS T1 JOIN rankings AS T2 ON T1.player_id = T2.player_id GROUP BY T1.first_name",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "find the number of players for each country.",
+      "gold_sql": "SELECT count(*) ,  country_code FROM players GROUP BY country_code",
+      "base_pred": "SELECT country_code, COUNT(player_id) AS player_count FROM players GROUP BY country_code;",
+      "finetuned_pred": "SELECT count(*) ,  country_code FROM players GROUP BY country_code",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "How many players are from each country?",
+      "gold_sql": "SELECT count(*) ,  country_code FROM players GROUP BY country_code",
+      "base_pred": "SELECT country_code, COUNT(player_id) AS player_count FROM players GROUP BY country_code;",
+      "finetuned_pred": "SELECT count(*) ,  country_code FROM players GROUP BY country_code",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the number of matches happened in each year.",
+      "gold_sql": "SELECT count(*) ,  YEAR FROM matches GROUP BY YEAR",
+      "base_pred": "SELECT year, COUNT(*) AS matches_played\nFROM matches\nGROUP BY year;",
+      "finetuned_pred": "SELECT count(*) ,  YEAR FROM matches GROUP BY YEAR",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "How many matches were played in each year?",
+      "gold_sql": "SELECT count(*) ,  YEAR FROM matches GROUP BY YEAR",
+      "base_pred": "SELECT year, COUNT(*) AS matches_played\nFROM matches\nGROUP BY year;",
+      "finetuned_pred": "SELECT count(*) ,  YEAR FROM matches GROUP BY YEAR",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "How many different winners both participated in the WTA Championships and were left handed?",
+      "gold_sql": "SELECT count(DISTINCT winner_name) FROM matches WHERE tourney_name  =  'WTA Championships' AND winner_hand  =  'L'",
+      "base_pred": "SELECT COUNT(winner_id)\nFROM matches\nJOIN players ON matches.winner_id = players.player_id\nWHERE players.hand = 'L' AND matches.tourney_name = 'WTA Championships';",
+      "finetuned_pred": "SELECT count(DISTINCT T1.winner_id) FROM matches AS T1 JOIN players AS T2 ON T1.winner_id  =  T2.player_id WHERE T1.tourney_name  =  \"WTA Championships\" AND T2.hand  =  \"L\";",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "Find the number of players for each hand type.",
+      "gold_sql": "SELECT count(*) ,  hand FROM players GROUP BY hand",
+      "base_pred": "SELECT hand, COUNT(*) AS player_count FROM players GROUP BY hand;",
+      "finetuned_pred": "SELECT count(*) ,  hand FROM players GROUP BY hand",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "wta_1",
+      "question": "How many players are there for each hand type?",
+      "gold_sql": "SELECT count(*) ,  hand FROM players GROUP BY hand",
+      "base_pred": "SELECT hand, COUNT(*) AS player_count FROM players GROUP BY hand;",
+      "finetuned_pred": "SELECT count(*) ,  hand FROM players GROUP BY hand",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What are the names and id of courses having at most 2 sections?",
+      "gold_sql": "SELECT T1.course_name ,  T1.course_id FROM Courses AS T1 JOIN Sections AS T2 ON T1.course_id  =  T2.course_id GROUP BY T1.course_id HAVING count(*)  <=  2",
+      "base_pred": "SELECT c.course_name, c.course_id \nFROM Courses c \nJOIN Sections s ON c.course_id = s.course_id \nGROUP BY c.course_id, c.course_name \nHAVING COUNT(s.section_id) < 2;",
+      "finetuned_pred": "SELECT T1.course_name ,  T1.course_id FROM courses AS T1 JOIN sections AS T2 ON T1.course_id  =  T2.course_id GROUP BY T1.course_id HAVING count(*)  <=  2",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What is the semester which most student registered in? Show both the name and the id.",
+      "gold_sql": "SELECT T1.semester_name ,  T1.semester_id FROM Semesters AS T1 JOIN Student_Enrolment AS T2 ON T1.semester_id  =  T2.semester_id GROUP BY T1.semester_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT \n    S.semester_name,\n    S.semester_id,\n    COUNT(DISTINCT SE.student_id) AS student_count\nFROM \n    Semesters S\nJOIN \n    Student_Enrolment SE ON S.semester_id = SE.semester_id\nGROUP BY \n    S.semester_name, S.semester_id\nORDER BY \n    student_count DESC;",
+      "finetuned_pred": "SELECT T1.semester_name ,  T2.semester_id FROM semesters AS T1 JOIN student_enrolment AS T2 ON T1.semester_id  =  T2.semester_id GROUP BY T2.semester_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "For each semester, what is the name and id of the one with the most students registered?",
+      "gold_sql": "SELECT T1.semester_name ,  T1.semester_id FROM Semesters AS T1 JOIN Student_Enrolment AS T2 ON T1.semester_id  =  T2.semester_id GROUP BY T1.semester_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT \n    S.semester_name,\n    S.semester_id,\n    COUNT(DISTINCT SE.student_id) AS student_count\nFROM \n    Semesters S\nJOIN \n    Student_Enrolment SE ON S.semester_id = SE.semester_id\nGROUP BY \n    S.semester_name, S.semester_id\nORDER BY \n    student_count DESC;",
+      "finetuned_pred": "SELECT T1.semester_name ,  T1.semester_id FROM semesters AS T1 JOIN student_enrolment AS T2 ON T1.semester_id  =  T2.semester_id GROUP BY T1.semester_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "Who are enrolled in 2 degree programs in one semester? List the first name, middle name and last name and the id.",
+      "gold_sql": "SELECT T1.first_name ,  T1.middle_name ,  T1.last_name ,  T1.student_id FROM Students AS T1 JOIN Student_Enrolment AS T2 ON T1.student_id  =  T2.student_id GROUP BY T1.student_id HAVING count(*)  =  2",
+      "base_pred": "SELECT \n    s.first_name, \n    s.middle_name, \n    s.last_name, \n    s.student_id\nFROM \n    Students s\nJOIN \n    Student_Enrolment se ON s.student_id = se.student_id\nGROUP BY \n    s.student_id, \n    s.first_name, \n    s.middle_name, \n    s.last_name\nHAVING \n    COUNT(DISTINCT se.degree_program_id) = 2;",
+      "finetuned_pred": "SELECT T1.first_name ,  T1.middle_name ,  T1.last_name ,  T1.student_id FROM students AS T1 JOIN student_enrolment AS T2 ON T1.student_id  =  T2.student_id GROUP BY T1.student_id HAVING count(*)  =  2",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "What is the id, line 1, and line 2 of the address with the most students?",
+      "gold_sql": "SELECT T1.address_id ,  T1.line_1 ,  T1.line_2 FROM Addresses AS T1 JOIN Students AS T2 ON T1.address_id  =  T2.current_address_id GROUP BY T1.address_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT a.address_id, a.line_1, a.line_2\nFROM Addresses a\nJOIN Students s ON a.address_id = s.permanent_address_id\nGROUP BY a.address_id, a.line_1, a.line_2\nORDER BY COUNT(s.student_id) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.address_id ,  T1.line_1 ,  T1.line_2 FROM addresses AS T1 JOIN students AS T2 ON T1.address_id  =  T2.permanent_address_id GROUP BY T1.address_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "student_transcripts_tracking",
+      "question": "How many different addresses do the students currently live?",
+      "gold_sql": "SELECT count(DISTINCT current_address_id) FROM Students",
+      "base_pred": "SELECT DISTINCT a.address_id, a.line_1, a.line_2, a.line_3, a.city, a.zip_postcode, a.state_province_county, a.country, a.other_address_details\nFROM Addresses a\nJOIN Students s ON a.address_id = s.current_address_id OR a.address_id = s.permanent_address_id;",
+      "finetuned_pred": "SELECT count(DISTINCT current_address_id) FROM Students",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "What is the TV Channel that shows the cartoon \"The Rise of the Blue Beetle!\"? List the TV Channel's series name.",
+      "gold_sql": "SELECT T1.series_name FROM TV_Channel AS T1 JOIN Cartoon AS T2 ON T1.id = T2.Channel WHERE T2.Title = \"The Rise of the Blue Beetle!\";",
+      "base_pred": "SELECT T2.series_name \nFROM Cartoon AS T1 \nJOIN TV_Channel AS T2 ON T1.Channel = T2.id \nWHERE T1.Title = 'The Rise of the Blue Beetle';",
+      "finetuned_pred": "SELECT T2.series_name FROM Cartoon AS T1 JOIN TV_Channel AS T2 ON T1.Channel  =  T2.id WHERE T1.Title  =  \"The Rise of the Blue Beetle!\"",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "Find the number of cartoons directed by each of the listed directors.",
+      "gold_sql": "SELECT count(*) ,  Directed_by FROM cartoon GROUP BY Directed_by",
+      "base_pred": "SELECT Directed_by, COUNT(*) AS Number_of_Cartoons\nFROM Cartoon\nGROUP BY Directed_by;",
+      "finetuned_pred": "SELECT COUNT(*) ,  directed_by FROM cartoon GROUP BY directed_by",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "Find the series name and country of the tv channel that is playing some cartoons directed by Ben Jones and Michael Chang?",
+      "gold_sql": "SELECT T1.series_name ,  T1.country FROM TV_Channel AS T1 JOIN cartoon AS T2 ON T1.id = T2.Channel WHERE T2.directed_by  =  'Michael Chang' INTERSECT SELECT T1.series_name ,  T1.country FROM TV_Channel AS T1 JOIN cartoon AS T2 ON T1.id = T2.Channel WHERE T2.directed_by  =  'Ben Jones'",
+      "base_pred": "SELECT DISTINCT tc.series_name, tc.Country\nFROM TV_Channel tc\nJOIN Cartoon c ON tc.id = c.Channel\nWHERE c.directed_by IN ('Ben Jones', 'Michael Chang');",
+      "finetuned_pred": "SELECT T2.series_name ,  T2.Country FROM cartoon AS T1 JOIN TV_channel AS T2 ON T1.channel  =  T2.id WHERE T1.directed_by  =  \"Ben Jones\" INTERSECT SELECT T2.series_name ,  T2.Country FROM cartoon AS T1 JOIN TV_channel AS T2 ON T1.channel  =  T2.id WHERE T1.directed_by  =  \"Michael Chang\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "What is the series name and country of all TV channels that are playing cartoons directed by Ben Jones and cartoons directed by Michael Chang?",
+      "gold_sql": "SELECT T1.series_name ,  T1.country FROM TV_Channel AS T1 JOIN cartoon AS T2 ON T1.id = T2.Channel WHERE T2.directed_by  =  'Michael Chang' INTERSECT SELECT T1.series_name ,  T1.country FROM TV_Channel AS T1 JOIN cartoon AS T2 ON T1.id = T2.Channel WHERE T2.directed_by  =  'Ben Jones'",
+      "base_pred": "SELECT DISTINCT tc.series_name, tc.Country\nFROM TV_Channel tc\nJOIN Cartoon c ON tc.id = c.Channel\nWHERE c.directed_by IN ('Ben Jones', 'Michael Chang');",
+      "finetuned_pred": "SELECT T2.series_name ,  T2.Country FROM cartoon AS T1 JOIN tv_channel AS T2 ON T1.channel  =  T2.id WHERE T1.directed_by  =  \"Ben Jones\" INTERSECT SELECT T2.series_name ,  T2.Country FROM cartoon AS T1 JOIN tv_channel AS T2 ON T1.channel  =  T2.id WHERE T1.directed_by  =  \"Michael Chang\"",
+      "difficulty": "extra_hard"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "find id of the tv channels that from the countries where have more than two tv channels.",
+      "gold_sql": "SELECT id FROM tv_channel GROUP BY country HAVING count(*)  >  2",
+      "base_pred": "SELECT id \nFROM TV_Channel \nGROUP BY id \nHAVING COUNT(id) > 2;",
+      "finetuned_pred": "SELECT id FROM TV_channel GROUP BY country HAVING count(*)  >  2",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "What are the ids of all tv channels that have more than 2 TV channels?",
+      "gold_sql": "SELECT id FROM tv_channel GROUP BY country HAVING count(*)  >  2",
+      "base_pred": "SELECT id \nFROM TV_Channel \nGROUP BY id \nHAVING COUNT(id) > 2;",
+      "finetuned_pred": "SELECT id FROM TV_channel GROUP BY content HAVING count(*)  >  2",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "tvshow",
+      "question": "find the package option of the tv channel that do not have any cartoon directed by Ben Jones.",
+      "gold_sql": "SELECT package_option FROM TV_Channel WHERE id NOT IN (SELECT channel FROM cartoon WHERE directed_by  =  'Ben Jones')",
+      "base_pred": "SELECT DISTINCT PC.Package_Option\nFROM TV_Channel PC\nWHERE PC.id NOT IN (\n    SELECT C.Channel\n    FROM Cartoon C\n    WHERE C.Directed_by = 'Ben Jones'\n);",
+      "finetuned_pred": "SELECT Package_Option FROM TV_channel WHERE id NOT IN ( SELECT Channel FROM Cartoon WHERE Directed_by  =  \"Ben Jones\" )",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the total surface area of the countries in the Caribbean region?",
+      "gold_sql": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\"",
+      "base_pred": "SELECT SUM(SurfaceArea) AS TotalSurfaceArea FROM country WHERE Continent = 'Caribbean';",
+      "finetuned_pred": "SELECT sum(SurfaceArea) FROM country WHERE Region  =  \"Caribbean\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which continent is Anguilla in?",
+      "gold_sql": "SELECT Continent FROM country WHERE Name  =  \"Anguilla\"",
+      "base_pred": "SELECT T1.Continent FROM country AS T1 JOIN city AS T2 ON T1.Code = T2.CountryCode WHERE T2.Name = 'Anguilla';",
+      "finetuned_pred": "SELECT Continent FROM country WHERE name = 'Anguilla'",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which language is the most popular in Aruba?",
+      "gold_sql": "SELECT T2.Language FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.Name  =  \"Aruba\" ORDER BY Percentage DESC LIMIT 1",
+      "base_pred": "SELECT T1.Language \nFROM countrylanguage AS T1 \nJOIN country AS T2 ON T1.CountryCode = T2.Code \nWHERE T2.Name = 'Aruba' AND T1.IsOfficial = 'T';",
+      "finetuned_pred": "SELECT T1.Language FROM country AS T2 JOIN countrylanguage AS T1 ON T1.CountryCode  =  T2.Code WHERE T2.Name  =  'Aruba' ORDER BY T1.Percentage DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the average expected life expectancy for countries in the region of Central Africa?",
+      "gold_sql": "SELECT avg(LifeExpectancy) FROM country WHERE Region  =  \"Central Africa\"",
+      "base_pred": "SELECT AVG(LifeExpectancy) AS AverageLifeExpectancy\nFROM country\nWHERE Continent = 'Central Africa';",
+      "finetuned_pred": "SELECT avg(LifeExpectancy) FROM country WHERE Region  =  \"Central Africa\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the total population and maximum GNP in Asia?",
+      "gold_sql": "SELECT sum(Population) ,  max(GNP) FROM country WHERE Continent  =  \"Asia\"",
+      "base_pred": "SELECT SUM(T1.Population) AS TotalPopulation, MAX(T1.GNP) AS LargestGNP\nFROM country AS T1\nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode\nWHERE T1.Continent = 'Asia';",
+      "finetuned_pred": "SELECT sum(population) ,  max(gnp) FROM country WHERE continent  =  \"Asia\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many people live in Asia, and what is the largest GNP among them?",
+      "gold_sql": "SELECT sum(Population) ,  max(GNP) FROM country WHERE Continent  =  \"Asia\"",
+      "base_pred": "SELECT SUM(T1.Population) AS TotalPopulation, MAX(T1.GNP) AS LargestGNP\nFROM country AS T1\nJOIN countrylanguage AS T2 ON T1.Code = T2.CountryCode\nWHERE T1.Continent = 'Asia';",
+      "finetuned_pred": "SELECT sum(Population) ,  max(GNP) FROM country WHERE Continent  =  \"Asia\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the average GNP and total population in all nations whose government is US territory?",
+      "gold_sql": "SELECT avg(GNP) ,  sum(population) FROM country WHERE GovernmentForm  =  \"US Territory\"",
+      "base_pred": "SELECT AVG(GNP), SUM(Population) FROM country WHERE Name = 'United States';",
+      "finetuned_pred": "SELECT avg(GNP) ,  sum(Population) FROM country WHERE GovernmentForm = \"US Territory\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Give the mean GNP and total population of nations which are considered US territory.",
+      "gold_sql": "SELECT avg(GNP) ,  sum(population) FROM country WHERE GovernmentForm  =  \"US Territory\"",
+      "base_pred": "SELECT AVG(GNP), SUM(Population) FROM country WHERE Name = 'United States';",
+      "finetuned_pred": "SELECT avg(GNP) ,  sum(Population) FROM country WHERE GovernmentForm = \"US Territory\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "What is the language that is used by the largest number of Asian nations?",
+      "gold_sql": "SELECT T2.Language FROM country AS T1 JOIN countrylanguage AS T2 ON T1.Code  =  T2.CountryCode WHERE T1.Continent  =  \"Asia\" GROUP BY T2.Language ORDER BY COUNT (*) DESC LIMIT 1",
+      "base_pred": "SELECT T1.Language \nFROM countrylanguage AS T1 \nJOIN country AS T2 ON T1.CountryCode = T2.Code \nWHERE T2.Continent = 'Asia' \nORDER BY T1.Percentage DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Language FROM country AS T2 JOIN countrylanguage AS T1 ON T1.CountryCode  =  T2.Code WHERE T2.Continent  =  'Asia' GROUP BY T1.Language ORDER BY SUM(T1.Percentage) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Which unique cities are in Asian countries where Chinese is the official language ?",
+      "gold_sql": "select distinct t3.name from country as t1 join countrylanguage as t2 on t1.code  =  t2.countrycode join city as t3 on t1.code  =  t3.countrycode where t2.isofficial  =  't' and t2.language  =  'chinese' and t1.continent  =  \"asia\"",
+      "base_pred": "SELECT DISTINCT c.Name \nFROM city c\nJOIN country co ON c.CountryCode = co.Code\nJOIN countrylanguage cl ON co.Code = cl.CountryCode\nWHERE co.Continent = 'Asia' AND cl.Language = 'Chinese' AND cl.IsOfficial = 'T';",
+      "finetuned_pred": "SELECT DISTINCT T1.Name FROM city AS T1 JOIN country AS T2 ON T1.CountryCode  =  T2.Code JOIN countrylanguage AS T3 ON T2.Code  =  T3.CountryCode WHERE T2.Continent  =  'Asia' AND T3.IsOfficial  =  'TRUE' AND T3.Language  =  \"Chinese\"",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "world_1",
+      "question": "Find the number of cities in each district whose population is greater than the average population of cities?",
+      "gold_sql": "SELECT count(*) ,  District FROM city WHERE Population  >  (SELECT avg(Population) FROM city) GROUP BY District",
+      "base_pred": "SELECT District, COUNT(*) AS CityCount\nFROM city\nWHERE Population > (SELECT AVG(Population) FROM city)\nGROUP BY District;",
+      "finetuned_pred": "SELECT count(*) ,  district FROM city WHERE population  >  ( SELECT avg(population) FROM city ) GROUP BY district",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "world_1",
+      "question": "How many cities in each district have a population that is above the average population across all cities?",
+      "gold_sql": "SELECT count(*) ,  District FROM city WHERE Population  >  (SELECT avg(Population) FROM city) GROUP BY District",
+      "base_pred": "SELECT District, COUNT(*) AS CityCount\nFROM city\nWHERE Population > (SELECT AVG(Population) FROM city)\nGROUP BY District;",
+      "finetuned_pred": "SELECT count(*) ,  district FROM city WHERE population  >  ( SELECT avg(population) FROM city ) GROUP BY district",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "What is the name of the conductor who has conducted the most orchestras?",
+      "gold_sql": "SELECT T1.Name FROM conductor AS T1 JOIN orchestra AS T2 ON T1.Conductor_ID  =  T2.Conductor_ID GROUP BY T2.Conductor_ID ORDER BY COUNT(*) DESC LIMIT 1",
+      "base_pred": "SELECT c.Name\nFROM conductor c\nJOIN orchestra o ON c.Conductor_ID = o.Conductor_ID\nGROUP BY c.Name\nORDER BY COUNT(o.Orchestra_ID) DESC\nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.Name FROM conductor AS T1 JOIN orchestra AS T2 ON T1.Conductor_ID  =  T2.Conductor_ID GROUP BY T2.Conductor_ID ORDER BY COUNT(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "Please show the record formats of orchestras in ascending order of count.",
+      "gold_sql": "SELECT Major_Record_Format FROM orchestra GROUP BY Major_Record_Format ORDER BY COUNT(*) ASC",
+      "base_pred": "SELECT Major_Record_Format, COUNT(*) AS Frequency\nFROM orchestra\nGROUP BY Major_Record_Format\nORDER BY Frequency DESC;",
+      "finetuned_pred": "SELECT major_record_format FROM orchestra GROUP BY major_record_format ORDER BY COUNT(*) ASC",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "orchestra",
+      "question": "What are the major record formats of orchestras, sorted by their frequency?",
+      "gold_sql": "SELECT Major_Record_Format FROM orchestra GROUP BY Major_Record_Format ORDER BY COUNT(*) ASC",
+      "base_pred": "SELECT Major_Record_Format, COUNT(*) AS Frequency\nFROM orchestra\nGROUP BY Major_Record_Format\nORDER BY Frequency DESC;",
+      "finetuned_pred": "SELECT Major_Record_Format FROM orchestra GROUP BY Major_Record_Format ORDER BY COUNT(*)",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Show the names of high school students and their corresponding number of friends.",
+      "gold_sql": "SELECT T2.name ,  count(*) FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id GROUP BY T1.student_id",
+      "base_pred": "SELECT H1.name, COUNT(F2.friend_id) AS num_friends\nFROM Highschooler H1\nLEFT JOIN Friend F2 ON H1.ID = F2.student_id\nGROUP BY H1.name;",
+      "finetuned_pred": "SELECT T1.name ,  count(*) FROM Highschooler AS T1 JOIN Friend AS T2 ON T1.id  =  T2.student_id GROUP BY T1.id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "What are the names of the high schoolers and how many friends does each have?",
+      "gold_sql": "SELECT T2.name ,  count(*) FROM Friend AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id GROUP BY T1.student_id",
+      "base_pred": "SELECT H1.name, COUNT(F2.friend_id) AS num_friends\nFROM Highschooler H1\nLEFT JOIN Friend F2 ON H1.ID = F2.student_id\nGROUP BY H1.name;",
+      "finetuned_pred": "SELECT T1.name ,  count(*) FROM Highschooler AS T1 JOIN Friend AS T2 ON T1.id  =  T2.student_id GROUP BY T2.student_id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Show the ids of high schoolers who have friends and are also liked by someone else.",
+      "gold_sql": "SELECT student_id FROM Friend INTERSECT SELECT liked_id FROM Likes",
+      "base_pred": "SELECT student_id FROM Friend INTERSECT SELECT student_id FROM Likes;",
+      "finetuned_pred": "SELECT student_id FROM friend INTERSECT SELECT liked_id FROM likes",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Show the names of high schoolers who have likes, and numbers of likes for each.",
+      "gold_sql": "SELECT T2.name ,  count(*) FROM Likes AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id GROUP BY T1.student_id",
+      "base_pred": "SELECT H1.name, COUNT(L.student_id) AS like_count\nFROM Highschooler H1\nJOIN Likes L ON H1.ID = L.student_id\nGROUP BY H1.name;",
+      "finetuned_pred": "SELECT T1.name ,  count(*) FROM Highschooler AS T1 JOIN Likes AS T2 ON T1.id  =  T2.student_id GROUP BY T2.student_id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "What are the names of high schoolers who have likes, and how many likes does each have?",
+      "gold_sql": "SELECT T2.name ,  count(*) FROM Likes AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id GROUP BY T1.student_id",
+      "base_pred": "SELECT H1.name, COUNT(L.student_id) AS like_count\nFROM Highschooler H1\nJOIN Likes L ON H1.ID = L.student_id\nGROUP BY H1.name;",
+      "finetuned_pred": "SELECT T1.name ,  count(*) FROM Highschooler AS T1 JOIN Likes AS T2 ON T1.id  =  T2.student_id GROUP BY T2.student_id",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "What is the name of the high schooler who has the greatest number of likes?",
+      "gold_sql": "SELECT T2.name FROM Likes AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id GROUP BY T1.student_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT H1.name \nFROM Highschooler H1 \nJOIN Likes L ON H1.ID = L.student_id \nGROUP BY H1.name \nORDER BY COUNT(L.liked_id) DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.name FROM Highschooler AS T1 JOIN Likes AS T2 ON T1.id  =  T2.student_id GROUP BY T2.student_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "network_1",
+      "question": "Give the name of the student with the most likes.",
+      "gold_sql": "SELECT T2.name FROM Likes AS T1 JOIN Highschooler AS T2 ON T1.student_id  =  T2.id GROUP BY T1.student_id ORDER BY count(*) DESC LIMIT 1",
+      "base_pred": "SELECT H1.name \nFROM Highschooler H1 \nJOIN Likes L ON H1.ID = L.student_id \nGROUP BY H1.name \nORDER BY COUNT(L.liked_id) DESC \nLIMIT 1;",
+      "finetuned_pred": "SELECT T1.name FROM highschooler AS T1 JOIN likes AS T2 ON T1.id  =  T2.student_id GROUP BY T2.student_id ORDER BY count(*) DESC LIMIT 1",
+      "difficulty": "medium"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "How many dogs went through any treatments?",
+      "gold_sql": "SELECT count(DISTINCT dog_id) FROM Treatments",
+      "base_pred": "SELECT COUNT(*) FROM Treatments;",
+      "finetuned_pred": "SELECT count(DISTINCT dog_id) FROM treatments",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "Count the number of dogs that went through a treatment.",
+      "gold_sql": "SELECT count(DISTINCT dog_id) FROM Treatments",
+      "base_pred": "SELECT COUNT(*) FROM Treatments;",
+      "finetuned_pred": "SELECT count(DISTINCT dog_id) FROM treatments",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "dog_kennels",
+      "question": "How many owners temporarily do not have any dogs?",
+      "gold_sql": "SELECT count(*) FROM Owners WHERE owner_id NOT IN ( SELECT owner_id FROM Dogs )",
+      "base_pred": "SELECT COUNT(*) FROM Owners WHERE owner_id NOT IN (SELECT owner_id FROM Dogs WHERE abandoned_yn = 'N');",
+      "finetuned_pred": "SELECT count(*) FROM owners WHERE owner_id NOT IN ( SELECT owner_id FROM dogs )",
+      "difficulty": "hard"
+    },
+    {
+      "db_id": "singer",
+      "question": "List the name of singers whose citizenship is not \"France\".",
+      "gold_sql": "SELECT Name FROM singer WHERE Citizenship != \"France\"",
+      "base_pred": "SELECT Name FROM singer WHERE Citizenship != 'French';",
+      "finetuned_pred": "SELECT name FROM singer WHERE citizenship != 'France'",
+      "difficulty": "easy"
+    },
+    {
+      "db_id": "real_estate_properties",
+      "question": "Show the property type descriptions of properties belonging to that code.",
+      "gold_sql": "SELECT T2.property_type_description FROM Properties AS T1 JOIN Ref_Property_Types AS T2 ON T1.property_type_code  =  T2.property_type_code GROUP BY T1.property_type_code",
+      "base_pred": "SELECT Ref_Property_Types.property_type_description \nFROM Properties \nJOIN Ref_Property_Types ON Properties.property_type_code = Ref_Property_Types.property_type_code;",
+      "finetuned_pred": "SELECT T1.property_type_description FROM ref_property_types AS T1 JOIN properties AS T2 ON T1.property_type_code  =  T2.property_type_code GROUP BY T2.property_type_code",
+      "difficulty": "easy"
+    }
+  ]
+}
